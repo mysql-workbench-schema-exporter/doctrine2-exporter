@@ -54,7 +54,7 @@ class MwbExporter_Formatter_Doctrine2_Annotation_Model_Table extends MwbExporter
 
         $return[] = $tmp . ')';
         $return[] = ' */';
-        $return[] = 'class MwbExporter_' . $this->getModelName();
+        $return[] = 'class ' . $this->getModelName();
         $return[] = '{';
 
         $return[] = $this->columns->display();
