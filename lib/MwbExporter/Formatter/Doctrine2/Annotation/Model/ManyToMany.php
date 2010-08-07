@@ -23,32 +23,26 @@
  *  THE SOFTWARE.
  */
 
-class MwbExporter_Formatter_Doctrine2_Annotation_Model_Columns extends MwbExporter_Core_Model_Columns
+class MwbExporter_Formatter_Doctrine2_Annotation_Model_ManyToMany
 {
-    public function __construct($data)
-    {
-        parent::__construct($data);
-    }
 
-    public function display()
-    {
-        $return = array();
-        
-        foreach($this->columns as $column){
-            $return[] = $column->display();
-        }
+    // checks if a relation indicates a many to many relation
 
-        return implode("\n", $return);
-    }
+    // public static function isRelationManyToMany(MwbExporter_Core_Model_ForeignKey $relation)
+    // {
+        // echo $relation->getOwningTable()->getModelName() . "\n";
+        // /*
+        // if($fk = $relation->getOwningTable()->hasForeignKeys()){
+            // $fk = $relation->getOwningTable()->getForeignKeys();
+            
+            // foreach($fk as $foreignKey){
+                // return $foreignKey->getReferencedTable();
+            // }
+            // return true;
+        // }
+        // return false;
+        // */
+        // return false;
+    // }
     
-    public function displayGetterAndSetter()
-    {
-        $return = array();
-
-        foreach($this->columns as $column){
-            $return[] = $column->displayGetterAndSetter();
-        }
-        
-        return implode("\n", $return);
-    }
 }
