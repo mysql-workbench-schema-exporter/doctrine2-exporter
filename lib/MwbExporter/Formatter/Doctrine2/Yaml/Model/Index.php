@@ -35,8 +35,8 @@ class Index extends \MwbExporter\Core\Model\Index
     public function display()
     {
         $return = array();
-        $return[] = '    ' . $this->config['name'] . ':';
-        $tmp = '      fields: [';
+        $return[] = $this->indentation(2) . $this->config['name'] . ':';
+        $tmp = $this->indentation(3) . 'fields: [';
         foreach($this->referencedColumn as $refColumn){
             $tmp .= $refColumn->getColumnName() . ',';
         }
@@ -44,7 +44,7 @@ class Index extends \MwbExporter\Core\Model\Index
 
         // disable type: index for foreign key indexes
         if(strtolower($this->config['indexType']) !== 'index') {
-            $return[] = '      type: ' . strtolower($this->config['indexType']);
+            $return[] = $this->indentation(3) . 'type: ' . strtolower($this->config['indexType']);
         }
 
         return implode("\n", $return);
