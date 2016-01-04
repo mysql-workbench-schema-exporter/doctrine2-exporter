@@ -1,0 +1,37 @@
+{
+	"name" : "mysql-workbench-schema-exporter/doctrine2-exporter",
+	"type" : "library",
+	"description" : "MySQL Workbench Schema Exporter for Doctrine 2",
+	"keywords" : [
+		"mysql",
+		"mysql workbench",
+		"database",
+		"cli",
+		"doctrine"
+	],
+	"homepage" : "https://github.com/mysql-workbench-schema-exporter/doctrine2-exporter",
+	"license" : "MIT",
+	"authors" : [{
+			"name" : "Johannes Mueller",
+			"email" : "circus2@web.de",
+			"role" : "Developer"
+		}, {
+			"name" : "Toha",
+			"email" : "tohenk@yahoo.com",
+			"role" : "Developer"
+		}, {
+			"name" : "Robert Vock",
+			"email" : "robertvock82@gmail.com",
+			"role" : "Developer"
+		}
+	],
+	"require" : {
+		"php" : ">=5.4.0",
+		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "^3.0.0"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"MwbExporter\\Formatter\\Doctrine2\\" : "lib/MwbExporter/Formatter/Doctrine2/"
+		}
+	}
+}
