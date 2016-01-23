@@ -222,7 +222,7 @@ Annotation with the following addons.
 
 ## Command Line Interface (CLI)
 
-See documentation for [mysql-workbench-schema-exporter(https://github.com/mysql-workbench-schema-exporter/mysql-workbench-schema-exporter#command-line-interface-cli)]
+See documentation for [mysql-workbench-schema-exporter](https://github.com/mysql-workbench-schema-exporter/mysql-workbench-schema-exporter#command-line-interface-cli)
 
 ## Links
 
