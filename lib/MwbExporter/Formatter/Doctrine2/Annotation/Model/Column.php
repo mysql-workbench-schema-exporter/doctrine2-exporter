@@ -33,6 +33,20 @@ use MwbExporter\Writer\WriterInterface;
 
 class Column extends BaseColumn
 {
+    private function getStringDefaultValue() {
+        $defaultValue = $this->getDefaultValue();
+        if (is_null($defaultValue)) {
+            $defaultValue = '';
+        } else {
+            if ($this->getColumnType() == 'com.mysql.rdbms.mysql.datatype.varchar') {
+                $defaultValue = " = '$defaultValue'";
+            } else {
+                $defaultValue = " = $defaultValue";
+            }
+        }
+        return $defaultValue;
+    }
+
     public function writeVar(WriterInterface $writer)
     {
         if (!$this->isIgnored()) {
@@ -46,7 +60,7 @@ class Column extends BaseColumn
                 ->writeIf($this->isAutoIncrement(),
                         ' * '.$this->getTable()->getAnnotation('GeneratedValue', array('strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY)))))
                 ->write(' */')
-                ->write('protected $'.$this->getColumnName().';')
+                ->write('protected $'.$this->getColumnName().$this->getStringDefaultValue().';')
                 ->write('')
             ;
         }
