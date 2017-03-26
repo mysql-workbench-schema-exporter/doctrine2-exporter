@@ -200,6 +200,11 @@ Common Setup Options for Doctrine 2.0:
           column1,desc
         {/d:order}
 
+  * `{d:cache}READ_ONLY, NONSTRICT_READ_WRITE, READ_WRITE{/d:cache}` (applied to Table and/or ForeignKey)
+
+    You can specify Doctrine second level caching strategy as a comment on a table or foreign key. They will be generated into the Annotation or YAML.
+    ([Reference](http://doctrine-orm.readthedocs.io/en/latest/reference/second-level-cache.html))
+
 ### Doctrine 2.0 Annotation with ZF2 Input Filter Classes
 
 Doctrine 2.0 Annotation with ZF2 Input Filter Classes formatter directly extend Doctrine 2.0

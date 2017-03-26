@@ -153,6 +153,22 @@ abstract class Formatter extends BaseFormatter
     }
 
     /**
+     * get the cache option for an entity or a relation
+     *
+     * @param $cacheValue string cache option as given in comment for table or foreign key
+     * @return string valid cache value or null
+     */
+    public function getCacheOption($cacheValue)
+    {
+        if ($cacheValue) {
+            $cacheValue = strtoupper($cacheValue);
+            if (in_array($cacheValue, array('READ_ONLY', 'NONSTRICT_READ_WRITE', 'READ_WRITE'))) {
+                return $cacheValue;
+            }
+        }
+    }
+
+    /**
      * Parse order option.
      *
      * @param string $sortValue
