@@ -40,7 +40,7 @@ class Formatter extends BaseFormatter
         $this->addConfigurations(array(
             static::CFG_INDENTATION                   => 4,
             static::CFG_FILENAME                      => '%entity%.dcm.%extension%',
-            static::CFG_EXTEND_TABLENAME_WITH_SCHEMA  => false,
+            static::CFG_EXTEND_TABLENAME_WITH_SCHEMA  => true,
         ));
     }
 
