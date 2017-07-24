@@ -53,6 +53,11 @@ class Column extends BaseColumn
         if ($this->isAutoIncrement()) {
             $values['generator'] = array('strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY)));
         }
+        if ($this->getDefaultValue() !== null) {
+            $values['options']['default'] = $this->getColumnType() == 'com.mysql.rdbms.mysql.datatype.varchar'
+                ? "'" . $this->getDefaultValue() . "'"
+                : $this->getDefaultValue() ;
+        }
 
         return $values;
     }
