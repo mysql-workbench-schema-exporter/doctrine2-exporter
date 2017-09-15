@@ -137,6 +137,7 @@ class Table extends BaseTable
     public function writeInputFilterColumns(WriterInterface $writer)
     {
         foreach ($this->getColumns() as $column) {
+            // by type
             switch ($this->getFormatter()->getDatatypeConverter()->getDataType($column->getColumnType())) {
                 case 'string':
                     $s_filters = 'array(
@@ -159,23 +160,9 @@ class Table extends BaseTable
                     $s_filters = 'array(
                     array(\'name\' => \'Zend\Filter\ToInt\'),
                 )';
-                    if (!$column->isPrimary() && $column->getLength() > 0) {
-                        $s_validators = sprintf('array(
-                                array(
-                                    \'name\' => \'Zend\I18n\Validator\IsInt\',
-                                    \'name\' => \'Zend\Validator\StringLength\',
-                                    \'options\' => array(
-                                    \'encoding\' => \'UTF-8\',
-                                    \'min\' => %s,
-                                    \'max\' => ' . $column->getLength() . '
-                                ),
-                            ),
-                        )', $column->isNotNull()?'1':'0');
-                    }else {
-                        $s_validators = 'array(
-                            array(\'name\' => \'Zend\I18n\Validator\IsInt\')
-                        )';
-                    }
+                    $s_validators = 'array(
+                        array(\'name\' => \'Zend\I18n\Validator\IsInt\')
+                    )';
                     break;
                 case 'boolean':
                     $s_filters = 'array(
@@ -187,31 +174,61 @@ class Table extends BaseTable
                     $s_filters = 'array()';
                     $s_validators = 'array()';
                     break;
+                case 'float':
+                    $s_filters = 'array(
+                    array(\'name\' => \'Zend\I18n\Filter\NumberFormat\')
+                )';
+                    $s_validators = 'array(
+                            array(\'name\' => \'Zend\I18n\Validator\IsFloat\')
+                        )';
+                    break;
                 case 'decimal':
                     $s_filters = 'array(
-                    array(\'name\' => \'Zend\Filter\Digits\'),
+                    array(\'name\' => \'Zend\Filter\Digits\')
                 )';
-                    $s_validators = 'array()';
+                    $s_validators = 'array(
+                            array(\'name\' => \'Zend\Validator\Digits\')
+                        )';
                     break;
                 case 'text':
                     $s_filters = 'array(
                 )';
-                    $s_validators = sprintf('array(
-                    array(
-                        \'name\' => \'Zend\Validator\StringLength\',
-                        \'options\' => array(
-                            \'encoding\' => \'UTF-8\',
-                            \'min\' => %s,
-                            \'max\' => ' . $column->getLength() . '
-                        ),
-                    ),
-                )', $column->isNotNull()?'1':'0');
+                    if ($column->getLength() > 0) {
+                        $s_validators = sprintf('array(
+                            array(
+                                \'name\' => \'Zend\Validator\StringLength\',
+                                \'options\' => array(
+                                    \'encoding\' => \'UTF-8\',
+                                    \'min\' => %s,
+                                    \'max\' => ' . $column->getLength() . '
+                                ),
+                            ),
+                        )', $column->isNotNull()?'1':'0');
+                    }else {
+                        $s_validators = 'array()';
+                    }
                     break;
                 default:
                     $s_filters = 'array()';
                     $s_validators = 'array()';
                 break;
             }
+            
+            // by name
+            if (strstr($column->getColumnName(), 'phone') or strstr($column->getColumnName(), '_tel')) {
+                $s_validators = 'array(
+                            array(\'name\' => \'Zend\I18n\Validator\PhoneNumber\')
+                        )';
+            }elseif (strstr($column->getColumnName(), 'email')){
+                $s_validators = 'array(
+                            array(\'name\' => \'Zend\Validator\EmailAddress\')
+                        )';
+            }elseif (strstr($column->getColumnName(), 'postcode') or strstr($column->getColumnName(), '_zip')){
+                $s_validators = 'array(
+                            array(\'name\' => \'Zend\I18n\Validator\PostCode\')
+                        )';
+            }
+            
             $writer
                 ->write('array(')
                 ->indent()
