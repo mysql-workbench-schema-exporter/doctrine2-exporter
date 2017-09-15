@@ -137,18 +137,92 @@ class Table extends BaseTable
     public function writeInputFilterColumns(WriterInterface $writer)
     {
         foreach ($this->getColumns() as $column) {
+            switch ($this->getFormatter()->getDatatypeConverter()->getDataType($column->getColumnType())) {
+                case 'string':
+                    $s_filters = 'array(
+                    array(\'name\' => \'Zend\Filter\StripTags\'),
+                    array(\'name\' => \'Zend\Filter\StringTrim\'),
+                )';
+                    $s_validators = sprintf('array(
+                    array(
+                        \'name\' => \'Zend\Validator\StringLength\',
+                        \'options\' => array(
+                            \'encoding\' => \'UTF-8\',
+                            \'min\' => %s,
+                            \'max\' => ' . $column->getLength() . '
+                        ),
+                    ),
+                )', $column->isNotNull()?'1':'0');
+                    break;
+                case 'smallint':
+                case 'integer':
+                    $s_filters = 'array(
+                    array(\'name\' => \'Zend\Filter\ToInt\'),
+                )';
+                    if (!$column->isPrimary() && $column->getLength() > 0) {
+                        $s_validators = sprintf('array(
+                                array(
+                                    \'name\' => \'Zend\I18n\Validator\IsInt\',
+                                    \'name\' => \'Zend\Validator\StringLength\',
+                                    \'options\' => array(
+                                    \'encoding\' => \'UTF-8\',
+                                    \'min\' => %s,
+                                    \'max\' => ' . $column->getLength() . '
+                                ),
+                            ),
+                        )', $column->isNotNull()?'1':'0');
+                    }else {
+                        $s_validators = 'array(
+                            array(\'name\' => \'Zend\I18n\Validator\IsInt\')
+                        )';
+                    }
+                    break;
+                case 'boolean':
+                    $s_filters = 'array(
+                    array(\'name\' => \'Zend\Filter\Boolean\'),
+                )';
+                    $s_validators = 'array()';
+                    break;
+                case 'datetime':
+                    $s_filters = 'array()';
+                    $s_validators = 'array()';
+                    break;
+                case 'decimal':
+                    $s_filters = 'array(
+                    array(\'name\' => \'Zend\Filter\Digits\'),
+                )';
+                    $s_validators = 'array()';
+                    break;
+                case 'text':
+                    $s_filters = 'array(
+                )';
+                    $s_validators = sprintf('array(
+                    array(
+                        \'name\' => \'Zend\Validator\StringLength\',
+                        \'options\' => array(
+                            \'encoding\' => \'UTF-8\',
+                            \'min\' => %s,
+                            \'max\' => ' . $column->getLength() . '
+                        ),
+                    ),
+                )', $column->isNotNull()?'1':'0');
+                    break;
+                default:
+                    $s_filters = 'array()';
+                    $s_validators = 'array()';
+                break;
+            }
             $writer
                 ->write('array(')
                 ->indent()
                     ->write('\'name\' => \'%s\',', $column->getColumnName())
                     ->write('\'required\' => %s,', $column->isNotNull() && !$column->isPrimary() ? 'true' : 'false')
-                    ->write('\'filters\' => array(),')
-                    ->write('\'validators\' => array(),')
+                    ->write('\'filters\' => %s,', $s_filters)
+                    ->write('\'validators\' => %s,', $s_validators)
                 ->outdent()
                 ->write('),')
             ;
         }
-
         return $this;
     }
 
