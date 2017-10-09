@@ -206,6 +206,11 @@ Doctrine 2.0 Annotation with ZF2 Input Filter Classes formatter directly extend 
 Annotation. The setup options and model comment behavior exactly the same as Doctrine 2.0
 Annotation with the following addons.
 
+Add Some `Zend\Validator\StringLength`,`Zend\Filter\StringTrim`,`Zend\Filter\StripTags` as string type column
+Add Some Filters like column name with 'phone' or '_tel' auto create filter with `Zend\I18n\Validator\PhoneNumber`
+and column name with 'email' auto create filter with `Zend\Validator\EmailAddress`
+
+
 #### Setup Options
 
   * `generateEntityPopulate`
