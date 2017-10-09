@@ -36,6 +36,8 @@ class Column extends BaseColumn
     public function writeVar(WriterInterface $writer)
     {
         if (!$this->isIgnored()) {
+            $useBehavioralExtensions = $this->getConfig()->get(Formatter::CFG_USE_BEHAVIORAL_EXTENSIONS);
+            $isBehavioralColumn = strstr($this->getTable()->getName(), '_img') && $useBehavioralExtensions;
             $comment = $this->getComment();
             $writer
                 ->write('/**')
@@ -45,6 +47,10 @@ class Column extends BaseColumn
                 ->write(' * '.$this->getTable()->getAnnotation('Column', $this->asAnnotation()))
                 ->writeIf($this->isAutoIncrement(),
                         ' * '.$this->getTable()->getAnnotation('GeneratedValue', array('strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY)))))
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'path'), ' * @Gedmo\UploadableFilePath')
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'name'), ' * @Gedmo\UploadableFileName')
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'mime'), ' * @Gedmo\UploadableFileMimeType')
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'size'), ' * @Gedmo\UploadableFileSize')
                 ->write(' */')
                 ->write('protected $'.$this->getColumnName().';')
                 ->write('')

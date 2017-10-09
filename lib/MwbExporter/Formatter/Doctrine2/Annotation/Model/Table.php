@@ -213,6 +213,7 @@ class Table extends BaseTable
         $skipGetterAndSetter = $this->getConfig()->get(Formatter::CFG_SKIP_GETTER_SETTER);
         $serializableEntity  = $this->getConfig()->get(Formatter::CFG_GENERATE_ENTITY_SERIALIZATION);
         $extendableEntity    = $this->getConfig()->get(Formatter::CFG_GENERATE_EXTENDABLE_ENTITY);
+        $useBehavioralExtensions = $this->getConfig()->get(Formatter::CFG_USE_BEHAVIORAL_EXTENSIONS);
         $lifecycleCallbacks  = $this->getLifecycleCallbacks();
 
         $extendsClass = $this->getClassToExtend();
@@ -233,6 +234,7 @@ class Table extends BaseTable
             })
             ->write('namespace %s;', $namespace)
             ->write('')
+            ->writeIf($useBehavioralExtensions && strstr($this->getClassName($extendableEntity), 'Img'), 'use Gedmo\Mapping\Annotation as Gedmo;')
             ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
                 $_this->writeUsedClasses($writer);
             })
@@ -246,6 +248,7 @@ class Table extends BaseTable
             ->writeIf($extendableEntity, ' * '.$this->getAnnotation('DiscriminatorColumn', $this->getInheritanceDiscriminatorColumn()))
             ->writeIf($extendableEntity, ' * '.$this->getAnnotation('DiscriminatorMap', array($this->getInheritanceDiscriminatorMap())))
             ->writeIf($lifecycleCallbacks, ' * @HasLifecycleCallbacks')
+            ->writeIf($useBehavioralExtensions && strstr($this->getClassName($extendableEntity), 'Img'), ' * @Gedmo\Uploadable(path="./public/upload/' . $this->getClassName($extendableEntity) . '", filenameGenerator="SHA1", allowOverwrite=true, appendNumber=true)')
             ->write(' */')
             ->write('class '.$this->getClassName($extendableEntity).$extendsClass.$implementsInterface)
             ->write('{')
