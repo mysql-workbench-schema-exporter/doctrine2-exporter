@@ -40,6 +40,7 @@ class Formatter extends BaseFormatter
     const CFG_GENERATE_ENTITY_SERIALIZATION  = 'generateEntitySerialization';
     const CFG_GENERATE_EXTENDABLE_ENTITY     = 'generateExtendableEntity';
     const CFG_QUOTE_IDENTIFIER_STRATEGY      = 'quoteIdentifierStrategy';
+    const CFG_USE_BEHAVIORAL_EXTENSIONS      = 'useBehavioralExtensions';
 
     const QUOTE_IDENTIFIER_AUTO              = 'auto';
     const QUOTE_IDENTIFIER_ALWAYS            = 'always';
@@ -55,6 +56,7 @@ class Formatter extends BaseFormatter
             static::CFG_SKIP_GETTER_SETTER              => false,
             static::CFG_GENERATE_ENTITY_SERIALIZATION   => true,
             static::CFG_GENERATE_EXTENDABLE_ENTITY      => false,
+            static::CFG_USE_BEHAVIORAL_EXTENSIONS       => false,
             static::CFG_QUOTE_IDENTIFIER_STRATEGY       => static::QUOTE_IDENTIFIER_AUTO,
             static::CFG_EXTENDS_CLASS                   => '',
             static::CFG_PROPERTY_TYPEHINT               => false,
