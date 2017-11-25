@@ -70,9 +70,10 @@ class Table extends BaseTable
     public function asYAML()
     {
         $namespace = $this->getNamespace(null, false);
+
         $values = array(
             'type' => 'entity',
-            'table' => $this->getRawTableName(), 
+            'table' => $this->getConfig()->get(Formatter::CFG_PREFIX_TABLENAME).$this->getRawTableName(),
         );
         // cache Mode
         if (!is_null($cacheMode = $this->getEntityCacheMode())) {
