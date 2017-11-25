@@ -214,6 +214,7 @@ class Table extends BaseTable
         $serializableEntity  = $this->getConfig()->get(Formatter::CFG_GENERATE_ENTITY_SERIALIZATION);
         $extendableEntity    = $this->getConfig()->get(Formatter::CFG_GENERATE_EXTENDABLE_ENTITY);
         $lifecycleCallbacks  = $this->getLifecycleCallbacks();
+        $cacheMode           = $this->getEntityCacheMode();
 
         $extendsClass = $this->getClassToExtend();
         $implementsInterface = $this->getInterfaceToImplement();
@@ -241,6 +242,7 @@ class Table extends BaseTable
             ->write(' *')
             ->writeIf($comment, $comment)
             ->write(' * '.$this->getAnnotation('Entity', array('repositoryClass' => $this->getConfig()->get(Formatter::CFG_AUTOMATIC_REPOSITORY) ? $repositoryNamespace.$this->getModelName().'Repository' : null)))
+            ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
             ->write(' * '.$this->getAnnotation('Table', array('name' => $this->quoteIdentifier($this->getRawTableName()), 'indexes' => $this->getIndexesAnnotation('Index'), 'uniqueConstraints' => $this->getIndexesAnnotation('UniqueConstraint'))))
             ->writeIf($extendableEntity, ' * '.$this->getAnnotation('InheritanceType', array('SINGLE_TABLE')))
             ->writeIf($extendableEntity, ' * '.$this->getAnnotation('DiscriminatorColumn', $this->getInheritanceDiscriminatorColumn()))
@@ -496,6 +498,7 @@ class Table extends BaseTable
             $targetEntityFQCN = $local->getOwningTable()->getModelNameAsFQCN($local->getReferencedTable()->getEntityNamespace());
             $mappedBy = $local->getReferencedTable()->getModelName();
             $related = $local->getForeignM2MRelatedName();
+            $cacheMode = $this->getFormatter()->getCacheOption($local->parseComment('cache'));
 
             $this->getDocument()->addLog(sprintf('  Writing 1 <=> ? relation "%s"', $targetEntity));
 
@@ -512,6 +515,7 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
                     ->write(' * '.$this->getAnnotation('OneToMany', $annotationOptions))
                     ->write(' * '.$this->getJoins($local))
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($local) {
@@ -530,6 +534,7 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
                     ->write(' * '.$this->getAnnotation('OneToOne', $annotationOptions))
                     ->write(' */')
                     ->write('protected $'.lcfirst($targetEntity).';')
@@ -558,12 +563,14 @@ class Table extends BaseTable
                 'cascade' => $this->getFormatter()->getCascadeOption($foreign->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($foreign->parseComment('fetch')),
             );
+            $cacheMode = $this->getFormatter()->getCacheOption($foreign->parseComment('cache'));
 
             if ($foreign->isManyToOne()) {
                 $this->getDocument()->addLog('  Relation considered as "N <=> 1"');
 
                 $writer
                     ->write('/**')
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
                     ->write(' * '.$this->getAnnotation('ManyToOne', $annotationOptions))
                     ->write(' * '.$this->getJoins($foreign, false))
                     ->write(' */')
@@ -580,6 +587,7 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
                     ->write(' * '.$this->getAnnotation('OneToOne', $annotationOptions))
                     ->write(' * '.$this->getJoins($foreign, false))
                     ->write(' */')
@@ -606,6 +614,7 @@ class Table extends BaseTable
                 'cascade' => $this->getFormatter()->getCascadeOption($fk1->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($fk1->parseComment('fetch')),
             );
+            $cacheMode = $this->getFormatter()->getCacheOption($fk1->parseComment('cache'));
 
             // if this is the owning side, also output the JoinTable Annotation
             // otherwise use "mappedBy" feature
@@ -618,6 +627,7 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
                     ->write(' * '.$this->getAnnotation('ManyToMany', $annotationOptions))
                     ->write(' * '.$this->getAnnotation('JoinTable',
                         array(
@@ -645,6 +655,7 @@ class Table extends BaseTable
                 $annotationOptions['inversedBy'] = null;
                 $writer
                     ->write('/**')
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
                     ->write(' * '.$this->getAnnotation('ManyToMany', $annotationOptions))
                     ->write(' */')
                 ;

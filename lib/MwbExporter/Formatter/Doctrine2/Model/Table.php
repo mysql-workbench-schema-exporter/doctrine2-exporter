@@ -53,6 +53,17 @@ class Table extends BaseTable
     }
 
     /**
+     * Get the entity cacheMode.
+     *
+     * @return string
+     */
+    public function getEntityCacheMode()
+    {
+        $cacheMode = strtoupper(trim($this->parseComment('cache')));
+        if (in_array($cacheMode, array('READ_ONLY', 'NONSTRICT_READ_WRITE', 'READ_WRITE'))) return $cacheMode;
+    }
+
+    /**
      * Get namespace of a class.
      *
      * @param string $class The class name
