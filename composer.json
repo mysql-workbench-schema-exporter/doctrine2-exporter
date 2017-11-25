@@ -1,5 +1,5 @@
 {
-	"name" : "christianjames/doctrine2-exporter",
+	"name" : "mysql-workbench-schema-exporter/doctrine2-exporter",
 	"type" : "library",
 	"description" : "MySQL Workbench Schema Exporter for Doctrine 2",
 	"keywords" : [
@@ -9,7 +9,7 @@
 		"cli",
 		"doctrine"
 	],
-	"homepage" : "https://github.com/christianjames/doctrine2-exporter",
+	"homepage" : "https://github.com/mysql-workbench-schema-exporter/doctrine2-exporter",
 	"license" : "MIT",
 	"authors" : [{
 			"name" : "Johannes Mueller",
