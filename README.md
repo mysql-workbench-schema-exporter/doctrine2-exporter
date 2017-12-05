@@ -209,6 +209,23 @@ Common Setup Options for Doctrine 2.0:
 
     You can specify Doctrine second level caching strategy as a comment on a table or foreign key. They will be generated into the Annotation or YAML.
     ([Reference](http://doctrine-orm.readthedocs.io/en/latest/reference/second-level-cache.html))
+    
+    
+  * `{d:relatedNames}RelationTable:NewName{/d:relatedNames}` (applied to Table)
+    
+    Overrides `relatedVarNameFormat`.
+
+    Rename generated related column names when the table names and the `relatedVarNameFormat` pattern are not good enough. The format should be CamelCase singular and should map with the class name that is generated for the related entity.
+    Can be written in the following format:
+
+        RelationTableName:CustomRelationName
+
+    Multiple relations are supported, separated by line break. Example usage:
+        - on the "Products" table, assuming that our schema has multiple tables for "categories" and "images" so we can't use just "Image" and "Category" names for these tables.
+        {d:relationNames}
+        ProductCategory:Category
+        ProductImage:Image
+        {/d:relationNames}
 
 ### Doctrine 2.0 Annotation with ZF2 Input Filter Classes
 

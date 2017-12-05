@@ -124,7 +124,22 @@ class Table extends BaseTable
      */
     public function getRelatedVarName($name, $related = null, $plural = false)
     {
-        $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
+        if ($this->getModelName() !== $name) {
+
+            $relationNames = trim($this->parseComment('relatedNames'));
+
+            foreach (explode("\n", $relationNames) as $relationMap) {
+                list($toChange, $replacement) = explode(':', $relationMap, 2);
+                if ($name === $toChange) {
+                    //var_dump($this->getModelName() . ' / ' . $name . ' / ' . $related . ' / ' . $replacement . ' / ' . $plural);
+                    $name = $replacement;
+                    break;
+                }
+            }
+        }
+        else {
+            $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
+        }
 
         return $plural ? Inflector::pluralize($name) : $name;
     }
