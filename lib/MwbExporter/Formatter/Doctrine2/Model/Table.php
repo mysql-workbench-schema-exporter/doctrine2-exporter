@@ -124,14 +124,17 @@ class Table extends BaseTable
      */
     public function getRelatedVarName($name, $related = null, $plural = false)
     {
+        /**
+         * if $name does not match the current ModelName (in case a relation column), check if the table comment includes the `relatedNames` tag
+         * and parse that to see if for $name was provided a custom value
+         */
         if ($this->getModelName() !== $name) {
 
-            $relationNames = trim($this->parseComment('relatedNames'));
+            $relatedNames = trim($this->parseComment('relatedNames'));
 
-            foreach (explode("\n", $relationNames) as $relationMap) {
+            foreach (explode("\n", $relatedNames) as $relationMap) {
                 list($toChange, $replacement) = explode(':', $relationMap, 2);
                 if ($name === $toChange) {
-                    //var_dump($this->getModelName() . ' / ' . $name . ' / ' . $related . ' / ' . $replacement . ' / ' . $plural);
                     $name = $replacement;
                     break;
                 }
