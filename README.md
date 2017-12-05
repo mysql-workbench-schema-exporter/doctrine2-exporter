@@ -221,11 +221,20 @@ Common Setup Options for Doctrine 2.0:
         RelationTableName:CustomRelationName
 
     Multiple relations are supported, separated by line break. Example usage:
-        - on the "Products" table, assuming that our schema has multiple tables for "categories" and "images" so we can't use just "Image" and "Category" names for these tables.
+        - on a "store_products" table with "store_product_categories" and "store_product_images" related tables:
+        
         {d:relationNames}
-        ProductCategory:Category
-        ProductImage:Image
+        StoreProductCategory:Category
+        StoreProductImage:Image
         {/d:relationNames}
+        
+    It can be used in both parent / child tables. For example, on a "store_product_images" table:
+    
+        {d:relationNames}
+        StoreProduct:Product
+        {/d:relationNames}
+        
+    The generated StoreProduct class will have "category" and "image" properties instead of "storeProductCategory" and "storeProductImage", while the "StoreProductImage" class will have a "product" property instead of "storeProduct".
 
 ### Doctrine 2.0 Annotation with ZF2 Input Filter Classes
 
