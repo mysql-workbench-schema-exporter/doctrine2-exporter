@@ -124,7 +124,30 @@ class Table extends BaseTable
      */
     public function getRelatedVarName($name, $related = null, $plural = false)
     {
-        $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
+        /**
+         * if $name does not match the current ModelName (in case a relation column), check if the table comment includes the `relatedNames` tag
+         * and parse that to see if for $name was provided a custom value
+         */
+
+        $nameFromCommentTag = '';
+        if ($this->getModelName() !== $name) {
+
+            $relatedNames = trim($this->parseComment('relatedNames'));
+
+            foreach (explode("\n", $relatedNames) as $relationMap) {
+                list($toChange, $replacement) = explode(':', $relationMap, 2);
+                if ($name === $toChange) {
+                    $nameFromCommentTag = $replacement;
+                    break;
+                }
+            }
+        }
+        if ($nameFromCommentTag) {
+            $name = $nameFromCommentTag;
+        }
+        else {
+            $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
+        }
 
         return $plural ? Inflector::pluralize($name) : $name;
     }
