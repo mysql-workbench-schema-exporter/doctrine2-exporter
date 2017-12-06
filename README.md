@@ -223,16 +223,16 @@ Common Setup Options for Doctrine 2.0:
     Multiple relations are supported, separated by line break. Example usage:
         - on a "store_products" table with "store_product_categories" and "store_product_images" related tables:
         
-        {d:relationNames}
+        {d:relatedNames}
         StoreProductCategory:Category
         StoreProductImage:Image
-        {/d:relationNames}
+        {/d:relatedNames}
         
     It can be used in both parent / child tables. For example, on a "store_product_images" table:
     
-        {d:relationNames}
+        {d:relatedNames}
         StoreProduct:Product
-        {/d:relationNames}
+        {/d:relatedNames}
         
     The generated StoreProduct class will have "category" and "image" properties instead of "storeProductCategory" and "storeProductImage", while the "StoreProductImage" class will have a "product" property instead of "storeProduct".
 
