@@ -121,6 +121,9 @@ class Column extends BaseColumn
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function asAnnotation()
     {
         $attributes = array(
@@ -137,8 +140,19 @@ class Column extends BaseColumn
         if ($this->isNullableRequired()) {
             $attributes['nullable'] = $this->getNullableValue();
         }
-        if($this->isUnsigned()) {
+
+        $attributes['options'] = array();
+        if ($this->isUnsigned()) {
             $attributes['options'] = array('unsigned' => true);
+        }
+
+        $rawDefaultValue = $this->parameters->get('defaultValue');
+        if ($rawDefaultValue != '') {
+            $attributes['options']['default'] = $rawDefaultValue == '' ? 'NULL' : $rawDefaultValue;
+        }
+
+        if (count($attributes['options']) == 0) {
+            unset($attributes['options']);
         }
 
         return $attributes;
