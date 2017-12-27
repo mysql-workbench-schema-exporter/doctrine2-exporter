@@ -40,6 +40,8 @@ class Column extends BaseColumn
         } else {
             if ($this->getColumnType() == 'com.mysql.rdbms.mysql.datatype.varchar') {
                 $defaultValue = " = '$defaultValue'";
+            } elseif ($this->isBoolean()) {
+                $defaultValue = " = ".($defaultValue == 0 ? 'false' : 'true');
             } else {
                 $defaultValue = " = $defaultValue";
             }
@@ -108,7 +110,7 @@ class Column extends BaseColumn
                 ->write(' *')
                 ->write(' * @return '.$nativeType)
                 ->write(' */')
-                ->write('public function get'.$this->getBeautifiedColumnName().'()')
+                ->write('public function '.$this->getColumnGetterName().'()')
                 ->write('{')
                 ->indent()
                     ->write('return $this->'.$this->getColumnName().';')
@@ -146,9 +148,9 @@ class Column extends BaseColumn
             $attributes['options'] = array('unsigned' => true);
         }
 
-        $rawDefaultValue = $this->parameters->get('defaultValue');
-        if ($rawDefaultValue != '') {
-            $attributes['options']['default'] = $rawDefaultValue == '' ? 'NULL' : $rawDefaultValue;
+        $rawDefaultValue = $this->parameters->get('defaultValue') == 'NULL' ? null : $this->parameters->get('defaultValue');
+        if ($rawDefaultValue !== '') {
+            $attributes['options']['default'] = $rawDefaultValue === '' ? null : $rawDefaultValue;
         }
 
         if (count($attributes['options']) == 0) {
