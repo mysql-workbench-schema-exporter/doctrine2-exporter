@@ -138,12 +138,10 @@ class DatatypeConverter extends BaseDatatypeConverter
 
     public function getMappedType(Column $column)
     {
-        $type = parent::getMappedType($column);
-        // map tinyint(1) as boolean
-        if ('tinyint' == substr($column->getColumnType(), -7) && 1 == $column->getParameters()->get('precision')) {
-            $type = 'boolean';
+        if ($column->isBoolean()) {
+            return 'boolean';
         }
 
-        return $type;
+        return parent::getMappedType($column);
     }
 }
