@@ -60,13 +60,21 @@ class Column extends BaseColumn
                 ->writeIf($comment, $comment)
                 ->writeIf($this->isPrimary,
                         ' * '.$this->getTable()->getAnnotation('Id'))
+                ->writeIf($useBehavioralExtensions && $this->getColumnName() === 'created_at',
+                        ' * @Gedmo\Timestampable(on="create")')
+                ->writeIf($useBehavioralExtensions && $this->getColumnName() === 'updated_at',
+                        ' * @Gedmo\Timestampable(on="update")')
                 ->write(' * '.$this->getTable()->getAnnotation('Column', $this->asAnnotation()))
                 ->writeIf($this->isAutoIncrement(),
                         ' * '.$this->getTable()->getAnnotation('GeneratedValue', array('strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY)))))
-                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'path'), ' * @Gedmo\UploadableFilePath')
-                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'name'), ' * @Gedmo\UploadableFileName')
-                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'mime'), ' * @Gedmo\UploadableFileMimeType')
-                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'size'), ' * @Gedmo\UploadableFileSize')
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'path'),
+                        ' * @Gedmo\UploadableFilePath')
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'name'),
+                        ' * @Gedmo\UploadableFileName')
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'mime'),
+                        ' * @Gedmo\UploadableFileMimeType')
+                ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'size'),
+                        ' * @Gedmo\UploadableFileSize')
                 ->write(' */')
                 ->write('protected $'.$this->getColumnName().$this->getStringDefaultValue().';')
                 ->write('')
@@ -80,7 +88,7 @@ class Column extends BaseColumn
     {
         if (!$this->isIgnored()) {
             $this->getDocument()->addLog(sprintf('  Writing setter/getter for column "%s"', $this->getColumnName()));
-    
+
             $table = $this->getTable();
             $converter = $this->getFormatter()->getDatatypeConverter();
             $nativeType = $converter->getNativeType($converter->getMappedType($this));
