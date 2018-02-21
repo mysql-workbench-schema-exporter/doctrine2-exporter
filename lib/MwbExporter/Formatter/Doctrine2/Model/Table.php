@@ -135,7 +135,7 @@ class Table extends BaseTable
             $relatedNames = trim($this->parseComment('relatedNames'));
 
             if (false !== strstr($relatedNames, PHP_EOL)) {
-                foreach (explode("\n", $relatedNames) as $relationMap) {
+                foreach (explode(PHP_EOL, $relatedNames) as $relationMap) {
                     list($toChange, $replacement) = explode(':', $relationMap, 2);
                     if ($name === $toChange) {
                         $nameFromCommentTag = $replacement;
