@@ -35,7 +35,7 @@ class Column extends BaseColumn
 {
     private function getStringDefaultValue() {
         $defaultValue = $this->getDefaultValue();
-        if (is_null($defaultValue)) {
+        if (is_null($defaultValue) || 'CURRENT_TIMESTAMP' == $defaultValue) {
             $defaultValue = '';
         } else {
             if ($this->getColumnType() == 'com.mysql.rdbms.mysql.datatype.varchar') {
