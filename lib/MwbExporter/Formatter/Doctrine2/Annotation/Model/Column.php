@@ -148,6 +148,10 @@ class Column extends BaseColumn
             $attributes['options'] = array('unsigned' => true);
         }
 
+        if ('json' === $attributes['type']) {
+            $attributes['options']['jsonb'] = true;
+        }
+
         $rawDefaultValue = $this->parameters->get('defaultValue') == 'NULL' ? null : $this->parameters->get('defaultValue');
         if ($rawDefaultValue !== '') {
             $attributes['options']['default'] = $rawDefaultValue === '' ? null : $rawDefaultValue;
