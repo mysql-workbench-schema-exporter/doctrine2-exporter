@@ -27,6 +27,7 @@
 namespace MwbExporter\Formatter\Doctrine2\Model;
 
 use MwbExporter\Model\Column as BaseColumn;
+use MwbExporter\Formatter\DatatypeConverterInterface;
 use MwbExporter\Formatter\Doctrine2\Formatter;
 
 class Column extends BaseColumn
@@ -96,5 +97,23 @@ class Column extends BaseColumn
         }
 
         return true;
+    }
+
+    /**
+     * Check If column is boolean.
+     *
+     * @return boolean
+     */
+    public function isBoolean()
+    {
+        $columnType = $this->getColumnType();
+
+        return $this->isUnsigned() &&
+            1 == $this->parameters->get('precision') ? true : false &&
+            (
+                DatatypeConverterInterface::DATATYPE_TINYINT == $columnType() ||
+                DatatypeConverterInterface::USERDATATYPE_BOOL == $columnType() ||
+                DatatypeConverterInterface::USERDATATYPE_BOOLEAN == $columnType()
+            );
     }
 }
