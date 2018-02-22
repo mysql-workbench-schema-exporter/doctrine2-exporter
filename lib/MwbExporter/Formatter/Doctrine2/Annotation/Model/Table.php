@@ -679,6 +679,7 @@ class Table extends BaseTable
             ->write('{')
             ->indent()
                 ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                    $_this->writeCurrentTimestampConstructor($writer);
                     $_this->writeRelationsConstructor($writer);
                     $_this->writeManyToManyConstructor($writer);
                 })
@@ -688,6 +689,15 @@ class Table extends BaseTable
         ;
 
         return $this;
+    }
+
+    public function writeCurrentTimestampConstructor(WriterInterface $writer)
+    {
+        foreach ($this->getColumns() as $column) {
+            if ('CURRENT_TIMESTAMP' === $column->getDefaultValue()) {
+                $writer->write('$this->%s = new \DateTime(\'now\');', $column->getColumnName());
+            }
+        }
     }
 
     public function writeRelationsConstructor(WriterInterface $writer)
