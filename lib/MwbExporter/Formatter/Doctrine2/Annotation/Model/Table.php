@@ -662,7 +662,8 @@ class Table extends BaseTable
             $fk1 = $relation['reference'];
             $isOwningSide = $this->getFormatter()->isOwningSide($relation, $fk2);
             $annotationOptions = array(
-                'targetEntity' => $relation['refTable']->getModelNameAsFQCN($this->getEntityNamespace()),
+//                'targetEntity' => $relation['refTable']->getModelNameAsFQCN($this->getEntityNamespace()),
+                'targetEntity' => $relation['refTable']->getModelNameAsFQCN(),
                 'mappedBy' => null,
                 'inversedBy' => lcfirst($this->getPluralModelName()),
                 'cascade' => $this->getFormatter()->getCascadeOption($fk1->parseComment('cascade')),
