@@ -117,6 +117,12 @@ Common Setup Options for Doctrine 2.0:
 
     Default is `false`.
 
+  * `extendableEntityHasDiscriminator`
+
+    If enabled, `DiscriminatorColumn` and `DiscriminatorMap` annotations will be used.
+
+    Default is `true`.
+
   * `quoteIdentifierStrategy`
 
     This option determine wheter identifier quoting is applied or not, depend on the strategy
