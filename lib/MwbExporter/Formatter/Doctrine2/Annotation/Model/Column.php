@@ -95,6 +95,10 @@ class Column extends BaseColumn
             $shouldTypehintProperties = $this->getConfig()->get(Formatter::CFG_PROPERTY_TYPEHINT);
             $typehint = $shouldTypehintProperties && class_exists($nativeType) ? "$nativeType " : '';
 
+            if (!$this->isNotNull()) {
+                $typehint = $shouldTypehintProperties && class_exists($nativeType) ? "?$nativeType " : '';
+            }
+
             $writer
                 // setter
                 ->write('/**')
