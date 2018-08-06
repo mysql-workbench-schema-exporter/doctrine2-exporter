@@ -108,8 +108,7 @@ class Column extends BaseColumn
     {
         $columnType = $this->getColumnType();
 
-        return $this->isUnsigned() &&
-            (1 == $this->parameters->get('precision')) &&
+        return 1 == $this->parameters->get('precision') &&
             (
                 DatatypeConverterInterface::DATATYPE_TINYINT == $columnType ||
                 DatatypeConverterInterface::USERDATATYPE_BOOL == $columnType ||
