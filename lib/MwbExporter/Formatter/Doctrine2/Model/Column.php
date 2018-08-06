@@ -108,12 +108,17 @@ class Column extends BaseColumn
     {
         $columnType = $this->getColumnType();
 
-        return $this->isUnsigned() &&
-            (1 == $this->parameters->get('precision')) &&
+        if (
+            DatatypeConverterInterface::USERDATATYPE_BOOL == $columnType ||
+            DatatypeConverterInterface::USERDATATYPE_BOOLEAN == $columnType ||
             (
-                DatatypeConverterInterface::DATATYPE_TINYINT == $columnType ||
-                DatatypeConverterInterface::USERDATATYPE_BOOL == $columnType ||
-                DatatypeConverterInterface::USERDATATYPE_BOOLEAN == $columnType
-            );
+                DatatypeConverterInterface::DATATYPE_TINYINT == $columnType &&
+                preg_match('/^(is|has|can)_/', $this->getColumnName())
+            )
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
