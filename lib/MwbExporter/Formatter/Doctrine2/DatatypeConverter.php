@@ -118,14 +118,11 @@ class DatatypeConverter extends BaseDatatypeConverter
                 break;
 
             case 'smallint':
-            case 'bigint':
                 $type = 'integer';
                 break;
 
             case 'decimal':
-                $type = 'float';
-                break;
-
+            case 'bigint':
             case 'text':
             case 'blob':
                 $type = 'string';
