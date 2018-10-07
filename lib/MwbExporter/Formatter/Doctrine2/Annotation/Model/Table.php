@@ -429,11 +429,11 @@ class Table extends BaseTable
     protected function getUsedClasses()
     {
         $uses = array();
-        if ($orm = $this->getOrmUse()) {
-            $uses[] = $orm;
-        }
         if (count($this->getTableM2MRelations()) || count($this->getAllLocalForeignKeys())) {
             $uses[] = $this->getCollectionClass();
+        }
+        if ($orm = $this->getOrmUse()) {
+            $uses[] = $orm;
         }
 
         return $uses;
@@ -781,20 +781,38 @@ class Table extends BaseTable
             $this->getDocument()->addLog(sprintf('  Writing setter/getter for N <=> ? "%s"', $local->getParameters()->get('name')));
 
             if ($local->isManyToOne()) {
+                // N <=> 1 references
                 $this->getDocument()->addLog(sprintf('  Applying setter/getter for "%s"', 'N <=> 1'));
 
                 $related = $local->getForeignM2MRelatedName();
                 $related_text = $local->getForeignM2MRelatedName(false);
+
+                $typehints = [
+                    'add_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), false),
+                    'add_phpdoc_return' => $this->typehint($this->getNamespace(), false),
+                    'add_arg' => $this->paramTypehint($local->getOwningTable()->getNamespace(), false),
+                    'add_return' => $this->returnTypehint(null, false),
+
+                    'remove_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), false),
+                    'remove_phpdoc_return' => $this->typehint($this->getNamespace(), false),
+                    'remove_arg' => $this->paramTypehint($local->getOwningTable()->getNamespace(), false),
+                    'remove_return' => $this->returnTypehint(null, false),
+
+                    'get_phpdoc' => $this->typehint($this->getCollectionInterface(), false),
+//                    'get_return' => $this->returnTypehint($this->getCollectionInterface(), false),
+                    'get_return' => $this->returnTypehint(null, false),
+                ];
 
                 $writer
                     // setter
                     ->write('/**')
                     ->write(' * Add '.trim($local->getOwningTable()->getModelName().' entity '.$related_text). ' to collection (one to many).')
                     ->write(' *')
-                    ->write(' * @param '.$local->getOwningTable()->getNamespace().' $'.lcfirst($local->getOwningTable()->getModelName()))
-                    ->write(' * @return '.$this->getNamespace())
+                    ->write(' * @param '.$typehints['add_phpdoc_arg'].' $'.lcfirst($local->getOwningTable()->getModelName()))
+                    ->write(' *')
+                    ->write(' * @return '.$typehints['add_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function add'.$this->getRelatedVarName($local->getOwningTable()->getModelName(), $related).'('.$local->getOwningTable()->getNamespace().' $'.lcfirst($local->getOwningTable()->getModelName()).')')
+                    ->write('public function add'.$this->getRelatedVarName($local->getOwningTable()->getModelName(), $related).'('.$typehints['add_arg'].'$'.lcfirst($local->getOwningTable()->getModelName()).')'.$typehints['add_return'])
                     ->write('{')
                     ->indent()
                         ->write('$this->'.lcfirst($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true)).'[] = $'.lcfirst($local->getOwningTable()->getModelName()).';')
@@ -807,10 +825,11 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Remove '.trim($local->getOwningTable()->getModelName().' entity '.$related_text). ' from collection (one to many).')
                     ->write(' *')
-                    ->write(' * @param '.$local->getOwningTable()->getNamespace().' $'.lcfirst($local->getOwningTable()->getModelName()))
-                    ->write(' * @return '.$this->getNamespace())
+                    ->write(' * @param '.$typehints['remove_phpdoc_arg'].' $'.lcfirst($local->getOwningTable()->getModelName()))
+                    ->write(' *')
+                    ->write(' * @return '.$typehints['remove_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function remove'.$this->getRelatedVarName($local->getOwningTable()->getModelName(), $related).'('.$local->getOwningTable()->getNamespace().' $'.lcfirst($local->getOwningTable()->getModelName()).')')
+                    ->write('public function remove'.$this->getRelatedVarName($local->getOwningTable()->getModelName(), $related).'('.$typehints['remove_arg'].'$'.lcfirst($local->getOwningTable()->getModelName()).')'.$typehints['remove_return'])
                     ->write('{')
                     ->indent()
                         ->write('$this->'.lcfirst($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true)).'->removeElement($'.lcfirst($local->getOwningTable()->getModelName()).');')
@@ -823,9 +842,9 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Get '.trim($local->getOwningTable()->getModelName().' entity '.$related_text).' collection (one to many).')
                     ->write(' *')
-                    ->write(' * @return '.$this->getCollectionInterface())
+                    ->write(' * @return '.$typehints['get_phpdoc'])
                     ->write(' */')
-                    ->write('public function get'.$this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true).'()')
+                    ->write('public function get'.$this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true).'()'.$typehints['get_return'])
                     ->write('{')
                     ->indent()
                         ->write('return $this->'.lcfirst($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true)).';')
@@ -834,17 +853,34 @@ class Table extends BaseTable
                     ->write('')
                 ;
             } else {
+                // 1 <=> 1 references
                 $this->getDocument()->addLog(sprintf('  Applying setter/getter for "%s"', '1 <=> 1'));
+
+                $nullable = true;
+                foreach ($local->getLocals() as $lc) {
+                    $nullable = $nullable && $lc->isNotNull();
+                }
+
+                $typehints = [
+                    'set_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), $nullable),
+                    'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
+                    'set_arg' => $this->paramTypehint($local->getOwningTable()->getNamespace(), $nullable),
+                    'set_return' => $this->returnTypehint(null, false),
+
+                    'get_phpdoc' => $this->typehint($local->getOwningTable()->getNamespace(), $nullable),
+                    'get_return' => $this->returnTypehint($local->getOwningTable()->getNamespace(), true),
+                ];
 
                 $writer
                     // setter
                     ->write('/**')
                     ->write(' * Set '.$local->getOwningTable()->getModelName().' entity (one to one).')
                     ->write(' *')
-                    ->write(' * @param '.$local->getOwningTable()->getNamespace().' $'.lcfirst($local->getOwningTable()->getModelName()))
-                    ->write(' * @return '.$this->getNamespace())
+                    ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.lcfirst($local->getOwningTable()->getModelName()))
+                    ->write(' *')
+                    ->write(' * @return '.$typehints['set_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function set'.$local->getOwningTable()->getModelName().'('.$local->getOwningTable()->getNamespace().' $'.lcfirst($local->getOwningTable()->getModelName()).' = null)')
+                    ->write('public function set'.$local->getOwningTable()->getModelName().'('.$typehints['set_arg'].'$'.lcfirst($local->getOwningTable()->getModelName()).')'.$typehints['set_return'])
                     ->write('{')
                     ->indent()
                         ->writeIf(!$local->isUnidirectional(), '$'.lcfirst($local->getOwningTable()->getModelName()).'->set'.$local->getReferencedTable()->getModelName().'($this);')
@@ -858,9 +894,9 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Get '.$local->getOwningTable()->getModelName().' entity (one to one).')
                     ->write(' *')
-                    ->write(' * @return '.$local->getOwningTable()->getNamespace())
+                    ->write(' * @return '.$typehints['get_phpdoc'])
                     ->write(' */')
-                    ->write('public function get'.$local->getOwningTable()->getModelName().'()')
+                    ->write('public function get'.$local->getOwningTable()->getModelName().'()'.$typehints['get_return'])
                     ->write('{')
                     ->indent()
                         ->write('return $this->'.lcfirst($local->getOwningTable()->getModelName()).';')
@@ -885,15 +921,31 @@ class Table extends BaseTable
                 $related = $this->getRelatedName($foreign);
                 $related_text = $this->getRelatedName($foreign, false);
 
+                $nullable = true;
+                foreach ($foreign->getLocals() as $lc) {
+                    $nullable = $nullable && $lc->isNotNull();
+                }
+
+                $typehints = [
+                    'set_phpdoc_arg' => $this->typehint($foreign->getReferencedTable()->getNamespace(), true),
+                    'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
+                    'set_arg' => $this->paramTypehint($foreign->getReferencedTable()->getNamespace(), true),
+                    'set_return' => $this->returnTypehint(null, false),
+
+                    'get_phpdoc' => $this->typehint($foreign->getReferencedTable()->getNamespace(), true),
+                    'get_return' => $this->returnTypehint($foreign->getReferencedTable()->getNamespace(), true),
+                ];
+
                 $writer
                     // setter
                     ->write('/**')
                     ->write(' * Set '.trim($foreign->getReferencedTable()->getModelName().' entity '.$related_text).' (many to one).')
                     ->write(' *')
-                    ->write(' * @param '.$foreign->getReferencedTable()->getNamespace().' $'.lcfirst($foreign->getReferencedTable()->getModelName()))
-                    ->write(' * @return '.$this->getNamespace())
+                    ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.lcfirst($foreign->getReferencedTable()->getModelName()))
+                    ->write(' *')
+                    ->write(' * @return '.$typehints['set_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function set'.$this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related).'('.$foreign->getReferencedTable()->getNamespace().' $'.lcfirst($foreign->getReferencedTable()->getModelName()).' = null)')
+                    ->write('public function set'.$this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related).'('.$typehints['set_arg'].'$'.lcfirst($foreign->getReferencedTable()->getModelName()).')'.$typehints['set_return'])
                     ->write('{')
                     ->indent()
                         ->write('$this->'.lcfirst($this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related)).' = $'.lcfirst($foreign->getReferencedTable()->getModelName()).';')
@@ -906,9 +958,9 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Get '.trim($foreign->getReferencedTable()->getModelName().' entity '.$related_text).' (many to one).')
                     ->write(' *')
-                    ->write(' * @return '.$foreign->getReferencedTable()->getNamespace())
+                    ->write(' * @return '.$typehints['get_phpdoc'])
                     ->write(' */')
-                    ->write('public function get'.$this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related).'()')
+                    ->write('public function get'.$this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related).'()'.$typehints['get_return'])
                     ->write('{')
                     ->indent()
                         ->write('return $this->'.lcfirst($this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related)).';')
@@ -919,15 +971,31 @@ class Table extends BaseTable
             } else {
                 $this->getDocument()->addLog(sprintf('  Applying setter/getter for "%s"', '1 <=> 1'));
 
+                $nullable = true;
+                foreach ($foreign->getLocals() as $lc) {
+                    $nullable = $nullable && $lc->isNotNull();
+                }
+
+                $typehints = [
+                    'set_phpdoc_arg' => $this->typehint($foreign->getReferencedTable()->getNamespace(), $nullable),
+                    'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
+                    'set_arg' => $this->paramTypehint($foreign->getReferencedTable()->getNamespace(), $nullable),
+                    'set_return' => $this->returnTypehint(null, false),
+
+                    'get_phpdoc' => $this->typehint($foreign->getReferencedTable()->getNamespace(), $nullable),
+                    'get_return' => $this->returnTypehint($foreign->getReferencedTable()->getNamespace(), true),
+                ];
+
                 $writer
                     // setter
                     ->write('/**')
                     ->write(' * Set '.$foreign->getReferencedTable()->getModelName().' entity (one to one).')
                     ->write(' *')
-                    ->write(' * @param '.$foreign->getReferencedTable()->getNamespace().' $'.lcfirst($foreign->getReferencedTable()->getModelName()))
-                    ->write(' * @return '.$this->getNamespace())
+                    ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.lcfirst($foreign->getReferencedTable()->getModelName()))
+                    ->write(' *')
+                    ->write(' * @return '.$typehints['set_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function set'.$foreign->getReferencedTable()->getModelName().'('.$foreign->getReferencedTable()->getNamespace().' $'.lcfirst($foreign->getReferencedTable()->getModelName()).')')
+                    ->write('public function set'.$foreign->getReferencedTable()->getModelName().'('.$typehints['set_arg'].'$'.lcfirst($foreign->getReferencedTable()->getModelName()).')'.$typehints['set_return'])
                     ->write('{')
                     ->indent()
                         ->write('$this->'.lcfirst($foreign->getReferencedTable()->getModelName()).' = $'.lcfirst($foreign->getReferencedTable()->getModelName()).';')
@@ -940,9 +1008,9 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Get '.$foreign->getReferencedTable()->getModelName().' entity (one to one).')
                     ->write(' *')
-                    ->write(' * @return '.$foreign->getReferencedTable()->getNamespace())
+                    ->write(' * @return '.$typehints['get_phpdoc'])
                     ->write(' */')
-                    ->write('public function get'.$foreign->getReferencedTable()->getModelName().'()')
+                    ->write('public function get'.$foreign->getReferencedTable()->getModelName().'()'.$typehints['get_return'])
                     ->write('{')
                     ->indent()
                         ->write('return $this->'.lcfirst($foreign->getReferencedTable()->getModelName()).';')
@@ -962,14 +1030,32 @@ class Table extends BaseTable
             $this->getDocument()->addLog(sprintf('  Writing N <=> N relation "%s"', $relation['refTable']->getModelName()));
 
             $isOwningSide = $this->getFormatter()->isOwningSide($relation, $fk2);
+
+            $typehints = [
+                'add_phpdoc_arg' => $this->typehint($relation['refTable']->getNamespace(), false),
+                'add_phpdoc_return' => $this->typehint($this->getNamespace($this->getModelName()), false),
+                'add_arg' => $this->paramTypehint($relation['refTable']->getNamespace(), false),
+                'add_return' => $this->returnTypehint(null, false),
+
+                'remove_phpdoc_arg' => $this->typehint($relation['refTable']->getNamespace(), false),
+                'remove_phpdoc_return' => $this->typehint($this->getNamespace($this->getModelName()), false),
+                'remove_arg' => $this->paramTypehint($relation['refTable']->getNamespace(), false),
+                'remove_return' => $this->returnTypehint(null, false),
+
+                'get_phpdoc' => $this->typehint($this->getCollectionInterface(), false),
+//                'get_return' => $this->returnTypehint($this->getCollectionInterface(), false),
+                'get_return' => $this->returnTypehint(null, false),
+            ];
+
             $writer
                 ->write('/**')
                 ->write(' * Add '.$relation['refTable']->getModelName().' entity to collection.')
                 ->write(' *')
-                ->write(' * @param '. $relation['refTable']->getNamespace().' $'.lcfirst($relation['refTable']->getModelName()))
-                ->write(' * @return '.$this->getNamespace($this->getModelName()))
+                ->write(' * @param '.$typehints['add_phpdoc_arg'].' $'.lcfirst($relation['refTable']->getModelName()))
+                ->write(' *')
+                ->write(' * @return '.$typehints['add_phpdoc_return'])
                 ->write(' */')
-                ->write('public function add'.$relation['refTable']->getModelName().'('.$relation['refTable']->getNamespace().' $'.lcfirst($relation['refTable']->getModelName()).')')
+                ->write('public function add'.$relation['refTable']->getModelName().'('.$typehints['add_arg'].'$'.lcfirst($relation['refTable']->getModelName()).')'.$typehints['add_return'])
                 ->write('{')
                 ->indent()
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation) {
@@ -986,10 +1072,11 @@ class Table extends BaseTable
                 ->write('/**')
                 ->write(' * Remove '.$relation['refTable']->getModelName().' entity from collection.')
                 ->write(' *')
-                ->write(' * @param '. $relation['refTable']->getNamespace().' $'.lcfirst($relation['refTable']->getModelName()))
-                ->write(' * @return '.$this->getNamespace($this->getModelName()))
+                ->write(' * @param '.$typehints['remove_phpdoc_arg'].' $'.lcfirst($relation['refTable']->getModelName()))
+                ->write(' *')
+                ->write(' * @return '.$typehints['remove_phpdoc_return'])
                 ->write(' */')
-                ->write('public function remove'.$relation['refTable']->getModelName().'('.$relation['refTable']->getNamespace().' $'.lcfirst($relation['refTable']->getModelName()).')')
+                ->write('public function remove'.$relation['refTable']->getModelName().'('.$typehints['remove_arg'].'$'.lcfirst($relation['refTable']->getModelName()).')'.$typehints['remove_return'])
                 ->write('{')
                 ->indent()
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation) {
@@ -1006,9 +1093,9 @@ class Table extends BaseTable
                 ->write('/**')
                 ->write(' * Get '.$relation['refTable']->getModelName().' entity collection.')
                 ->write(' *')
-                ->write(' * @return '.$this->getCollectionInterface())
+                ->write(' * @return '.$typehints['get_phpdoc'])
                 ->write(' */')
-                ->write('public function get'.$relation['refTable']->getPluralModelName().'()')
+                ->write('public function get'.$relation['refTable']->getPluralModelName().'()'.$typehints['get_return'])
                 ->write('{')
                 ->indent()
                     ->write('return $this->'.lcfirst($relation['refTable']->getPluralModelName()).';')
@@ -1046,5 +1133,32 @@ class Table extends BaseTable
         ;
 
         return $this;
+    }
+
+    protected function typehint(?string $type, bool $nullable): string
+    {
+        if (null === $type) {
+            return '';
+        }
+
+        return ($nullable ? '?' : '').str_replace(['integer', 'boolean'], ['int', 'bool'], $type);
+    }
+
+    protected function paramTypehint(?string $type, bool $nullable): string
+    {
+        if (null === $type || !$this->getConfig()->get(Formatter::CFG_PHP7_ARG_TYPEHINTS)) {
+            return '';
+        }
+
+        return $this->typehint($type, $nullable).' ';
+    }
+
+    protected function returnTypehint(?string $type, bool $nullable): string
+    {
+        if (null === $type || !$this->getConfig()->get(Formatter::CFG_PHP7_RETURN_TYPEHINTS)) {
+            return '';
+        }
+
+        return ': '.$this->typehint($type, $nullable);
     }
 }

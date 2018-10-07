@@ -92,22 +92,28 @@ class Column extends BaseColumn
             $table = $this->getTable();
             $converter = $this->getFormatter()->getDatatypeConverter();
             $nativeType = $converter->getNativeType($converter->getMappedType($this));
-            $shouldTypehintProperties = $this->getConfig()->get(Formatter::CFG_PROPERTY_TYPEHINT);
-            $typehint = $shouldTypehintProperties && class_exists($nativeType) ? "$nativeType " : '';
 
-            if (!$this->isNotNull()) {
-                $typehint = $shouldTypehintProperties && class_exists($nativeType) ? "?$nativeType " : '';
-            }
+            $typehints = [
+                'set_phpdoc_arg' => $this->typehint($nativeType, !$this->isNotNull()),
+                'set_phpdoc_return' => $this->typehint($table->getNamespace(), false),
+                'set_arg' => $this->paramTypehint($nativeType, !$this->isNotNull()),
+                'set_return' => $this->returnTypehint(null, false),
+
+                'get_phpdoc' => $this->typehint($nativeType, !$this->isNotNull()),
+//                'get_return' => $this->returnTypehint($nativeType, !$this->isNotNull()),
+                'get_return' => $this->returnTypehint($nativeType, null === $this->getDefaultValue()),
+            ];
 
             $writer
                 // setter
                 ->write('/**')
                 ->write(' * Set the value of '.$this->getColumnName().'.')
                 ->write(' *')
-                ->write(' * @param '.$nativeType.' $'.$this->getColumnName())
-                ->write(' * @return '.$table->getNamespace())
+                ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$this->getColumnName())
+                ->write(' *')
+                ->write(' * @return '.$typehints['set_phpdoc_return'])
                 ->write(' */')
-                ->write('public function set'.$this->getBeautifiedColumnName().'('.$typehint.'$'.$this->getColumnName().')')
+                ->write('public function set'.$this->getBeautifiedColumnName().'('.$typehints['set_arg'].'$'.$this->getColumnName().')'.$typehints['set_return'])
                 ->write('{')
                 ->indent()
                     ->write('$this->'.$this->getColumnName().' = $'.$this->getColumnName().';')
@@ -120,9 +126,9 @@ class Column extends BaseColumn
                 ->write('/**')
                 ->write(' * Get the value of '.$this->getColumnName().'.')
                 ->write(' *')
-                ->write(' * @return '.$nativeType)
+                ->write(' * @return '.$typehints['get_phpdoc'])
                 ->write(' */')
-                ->write('public function '.$this->getColumnGetterName().'()')
+                ->write('public function '.$this->getColumnGetterName().'()'.$typehints['get_return'])
                 ->write('{')
                 ->indent()
                     ->write('return $this->'.$this->getColumnName().';')
@@ -174,5 +180,46 @@ class Column extends BaseColumn
         }
 
         return $attributes;
+    }
+
+    protected function typehint(?string $type, bool $nullable): string
+    {
+        if (null === $type) {
+            return '';
+        }
+
+        return ($nullable || '\DateTime' === $type ? '?' : '').str_replace(['integer', 'boolean'], ['int', 'bool'], $type);
+    }
+
+    protected function paramTypehint(?string $type, bool $nullable): string
+    {
+        if (
+            null === $type ||
+            !$this->getConfig()->get(Formatter::CFG_PHP7_ARG_TYPEHINTS) ||
+            in_array(
+                $this->getTable()->getName().'.'.$this->getColumnName(),
+                $this->getConfig()->get(Formatter::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS)
+            )
+        ) {
+            return '';
+        }
+
+        return $this->typehint($type, $nullable).' ';
+    }
+
+    protected function returnTypehint(?string $type, bool $nullable): string
+    {
+        if (
+            null === $type ||
+            !$this->getConfig()->get(Formatter::CFG_PHP7_RETURN_TYPEHINTS) ||
+            in_array(
+                $this->getTable()->getName().'.'.$this->getColumnName(),
+                $this->getConfig()->get(Formatter::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS)
+            )
+        ) {
+            return '';
+        }
+
+        return ': '.$this->typehint($type, $nullable);
     }
 }
