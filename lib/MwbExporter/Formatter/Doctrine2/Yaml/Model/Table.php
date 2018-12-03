@@ -182,7 +182,7 @@ class Table extends BaseTable
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity' => $targetEntity,
-                    'inversedBy'   => lcfirst($this->getRelatedVarName($mappedBy, $related)),
+                    'mappedBy'   => lcfirst($this->getRelatedVarName($mappedBy, $related)),
                 ), $this->getJoins($local));
             }
             if (!is_null($cacheMode = $this->getFormatter()->getCacheOption($local->parseComment('cache')))) {
