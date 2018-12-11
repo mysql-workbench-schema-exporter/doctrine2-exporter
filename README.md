@@ -241,6 +241,21 @@ Common Setup Options for Doctrine 2.0:
         {/d:relatedNames}
         
     The generated StoreProduct class will have "category" and "image" properties instead of "storeProductCategory" and "storeProductImage", while the "StoreProductImage" class will have a "product" property instead of "storeProduct".
+    
+    
+   * `{d:relationNames}oneToManyName:manyToOneName{/d:relationNames}` (applied to ForeignKey)
+  
+     Overrides `relatedVarNameFormat` and the `relatedNames` tag from above. Useful when one table references another table multiple times, with multiple foreign keys.
+     
+     The two names should be the desired field names that this relation would be represented by in the two model classes.
+     
+     For example, considering a Ticket class and a User class. A ticket could reference the User class with two foreign keys: owner_id and assigned_user_id.
+     
+     On the Tickets table we could use 
+        - `{d:relationNames}owner:ownedTickets{/d:relationNames}` on the owner_id foreign key
+        and
+        - `{d:relationNames}assignedUser:assignedTickets{/d:relationNames}` on the assigned_user_id foreign key
+     to override the field names, so a Ticket will have `owner` and `assignedUser` fields, while User will have `ownedTickets` and `assignedTickets`.
 
 ### Doctrine 2.0 Annotation with ZF2 Input Filter Classes
 
