@@ -131,7 +131,7 @@ class Table extends BaseTable
      * @param string $related  Related name
      * @param boolean $plural  Return plural form
      * @param ForeignKey $foreign The foreign key object
-     * @param boolean $useM2OneName For foreign keys that have the relationNames tag, a flat to return the Many2One name even for
+     * @param boolean $useM2OneName For foreign keys that have the relationNames tag, a flag to return the Many2One name
      * @return string
      */
     public function getRelatedVarName($name, $related = null, $plural = false, ForeignKey $foreign = null, $useM2OneName = false)
@@ -149,7 +149,7 @@ class Table extends BaseTable
                 // Both names must be specified, otherwise the comment tag is not considered valid
 
                 if ($useM2OneName) {
-                    //the M2One name is requested
+                    //the M2One name is requested - needed for the add/remove to collection methods
                     $name = $manyToOneName;
                 }
                 else {
