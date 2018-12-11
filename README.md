@@ -252,10 +252,12 @@ Common Setup Options for Doctrine 2.0:
      For example, considering a Ticket class and a User class. A ticket could reference the User class with two foreign keys: owner_id and assigned_user_id.
      
      On the Tickets table we could use 
-        - `{d:relationNames}owner:ownedTickets{/d:relationNames}` on the owner_id foreign key
+        - `{d:relationNames}Owner:OwnedTickets{/d:relationNames}` on the owner_id foreign key
         and
-        - `{d:relationNames}assignedUser:assignedTickets{/d:relationNames}` on the assigned_user_id foreign key
+        - `{d:relationNames}AssignedUser:AssignedTickets{/d:relationNames}` on the assigned_user_id foreign key
      to override the field names, so a Ticket will have `owner` and `assignedUser` fields, while User will have `ownedTickets` and `assignedTickets`.
+     
+     Ideally these names would be CamelCase. The oneToMany would be singular and the ManyToOne would be plural.
 
 ### Doctrine 2.0 Annotation with ZF2 Input Filter Classes
 

@@ -129,10 +129,12 @@ class Table extends BaseTable
      *
      * @param string $name  Identifier name
      * @param string $related  Related name
-     * @param string $plural  Return plural form
+     * @param boolean $plural  Return plural form
+     * @param ForeignKey $foreign The foreign key object
+     * @param boolean $useM2OneName For foreign keys that have the relationNames tag, a flat to return the Many2One name even for
      * @return string
      */
-    public function getRelatedVarName($name, $related = null, $plural = false, ForeignKey $foreign = null)
+    public function getRelatedVarName($name, $related = null, $plural = false, ForeignKey $foreign = null, $useM2OneName = false)
     {
 
         if ($foreign && $foreign->parseComment('relationNames')) {
@@ -146,14 +148,22 @@ class Table extends BaseTable
             if ($oneToManyName && $manyToOneName) {
                 // Both names must be specified, otherwise the comment tag is not considered valid
 
-                if (!$plural) {
-                    //this would be the name of the field in the model that has a foreign key (one-to-many relation)
-                    $name = $oneToManyName;
-                } else {
-                    //this would be the name of the field in the model that is referenced by the foreign key (it as a many-to-one relation)
+                if ($useM2OneName) {
+                    //the M2One name is requested
                     $name = $manyToOneName;
                 }
-                return $name;
+                else {
+                    //If the plural flag is sent, it means the M2One relation name is requested
+                    if (!$plural) {
+                        //this would be the name of the field in the model that has a foreign key (one-to-many relation)
+                        $name = $oneToManyName;
+                    } else {
+                        //this would be the name of the field in the model that is referenced by the foreign key (it as a many-to-one relation)
+                        $name = $manyToOneName;
+                    }
+                }
+
+                return $plural ? Inflector::pluralize($name) : Inflector::singularize($name);
             }
         }
 
