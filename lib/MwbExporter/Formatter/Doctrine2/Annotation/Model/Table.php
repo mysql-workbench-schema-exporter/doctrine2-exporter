@@ -263,7 +263,7 @@ class Table extends BaseTable
             ->writeIf($comment, $comment)
             ->writeIf($extendableEntity, ' * @ORM\MappedSuperclass')
             ->writeIf($hasDeletableBehaviour,
-                    ' * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false)')
+                    ' * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false, hardDelete=false)')
             ->writeIf(!$extendableEntity,
                     ' * '.$this->getAnnotation('Entity', array('repositoryClass' => $this->getConfig()->get(Formatter::CFG_AUTOMATIC_REPOSITORY) ? $repositoryNamespace.$this->getModelName().'Repository' : null)))
             ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
