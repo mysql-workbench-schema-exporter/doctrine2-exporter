@@ -100,8 +100,7 @@ class Column extends BaseColumn
                 'set_return' => $this->returnTypehint(null, false),
 
                 'get_phpdoc' => $this->typehint($nativeType, !$this->isNotNull()),
-//                'get_return' => $this->returnTypehint($nativeType, !$this->isNotNull()),
-                'get_return' => $this->returnTypehint($nativeType, null === $this->getDefaultValue()),
+                'get_return' => $this->returnTypehint($nativeType, !$this->isNotNull()),
             ];
 
             $writer
