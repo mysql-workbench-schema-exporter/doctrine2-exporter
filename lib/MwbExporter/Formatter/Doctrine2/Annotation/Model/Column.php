@@ -39,13 +39,14 @@ class Column extends BaseColumn
             $defaultValue = '';
         } else {
             if ($this->getColumnType() == 'com.mysql.rdbms.mysql.datatype.varchar') {
-                $defaultValue = " = '$defaultValue'";
+                $defaultValue = " = $defaultValue";
             } elseif ($this->isBoolean()) {
                 $defaultValue = " = ".($defaultValue == 0 ? 'false' : 'true');
             } else {
                 $defaultValue = " = $defaultValue";
             }
         }
+
         return $defaultValue;
     }
 
@@ -100,7 +101,7 @@ class Column extends BaseColumn
                 'set_return' => $this->returnTypehint(null, false),
 
                 'get_phpdoc' => $this->typehint($nativeType, !$this->isNotNull()),
-                'get_return' => $this->returnTypehint($nativeType, !$this->isNotNull()),
+                'get_return' => $this->returnTypehint($nativeType, null === $this->getDefaultValue() ? true : !$this->isNotNull()),
             ];
 
             $writer
