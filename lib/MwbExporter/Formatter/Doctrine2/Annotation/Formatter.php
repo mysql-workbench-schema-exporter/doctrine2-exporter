@@ -35,7 +35,9 @@ class Formatter extends BaseFormatter
 {
     const CFG_ANNOTATION_PREFIX                     = 'useAnnotationPrefix';
     const CFG_EXTENDS_CLASS                         = 'extendsClass';
-    const CFG_PROPERTY_TYPEHINT                     = 'propertyTypehint';
+    const CFG_PHP7_ARG_TYPEHINTS                    = 'php7ArgTypehints';
+    const CFG_PHP7_RETURN_TYPEHINTS                 = 'php7ReturnTypehints';
+    const CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS        = 'php7SkippedColumnsTypehints';
     const CFG_SKIP_GETTER_SETTER                    = 'skipGetterAndSetter';
     const CFG_GENERATE_ENTITY_SERIALIZATION         = 'generateEntitySerialization';
     const CFG_GENERATE_EXTENDABLE_ENTITY            = 'generateExtendableEntity';
@@ -61,7 +63,9 @@ class Formatter extends BaseFormatter
             static::CFG_USE_BEHAVIORAL_EXTENSIONS           => false,
             static::CFG_QUOTE_IDENTIFIER_STRATEGY           => static::QUOTE_IDENTIFIER_AUTO,
             static::CFG_EXTENDS_CLASS                       => '',
-            static::CFG_PROPERTY_TYPEHINT                   => false,
+            static::CFG_PHP7_ARG_TYPEHINTS                  => false,
+            static::CFG_PHP7_RETURN_TYPEHINTS               => false,
+            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS      => [],
         ));
         $this->addValidators(array(
             static::CFG_QUOTE_IDENTIFIER_STRATEGY           => new ChoiceValidator(array(
