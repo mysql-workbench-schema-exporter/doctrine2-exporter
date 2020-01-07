@@ -77,7 +77,7 @@ class Column extends BaseColumn
                 ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'size'),
                         ' * @Gedmo\UploadableFileSize')
                 ->write(' */')
-                ->write('protected $'.$this->getColumnName().$this->getStringDefaultValue().';')
+                ->write('protected $'.$this->getBeautifiedColumnName(false).$this->getStringDefaultValue().';')
                 ->write('')
             ;
         }
@@ -107,16 +107,16 @@ class Column extends BaseColumn
             $writer
                 // setter
                 ->write('/**')
-                ->write(' * Set the value of '.$this->getColumnName().'.')
+                ->write(' * Set the value of '.$this->getBeautifiedColumnName(false).'.')
                 ->write(' *')
-                ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$this->getColumnName())
+                ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$this->getBeautifiedColumnName(false))
                 ->write(' *')
                 ->write(' * @return '.$typehints['set_phpdoc_return'])
                 ->write(' */')
-                ->write('public function set'.$this->getBeautifiedColumnName().'('.$typehints['set_arg'].'$'.$this->getColumnName().')'.$typehints['set_return'])
+                ->write('public function set'.$this->getBeautifiedColumnName().'('.$typehints['set_arg'].'$'.$this->getBeautifiedColumnName(false).')'.$typehints['set_return'])
                 ->write('{')
                 ->indent()
-                    ->write('$this->'.$this->getColumnName().' = $'.$this->getColumnName().';')
+                    ->write('$this->'.$this->getBeautifiedColumnName(false).' = $'.$this->getBeautifiedColumnName(false).';')
                     ->write('')
                     ->write('return $this;')
                 ->outdent()
@@ -124,7 +124,7 @@ class Column extends BaseColumn
                 ->write('')
                 // getter
                 ->write('/**')
-                ->write(' * Get the value of '.$this->getColumnName().'.')
+                ->write(' * Get the value of '.$this->getBeautifiedColumnName(false).'.')
                 ->write(' *')
                 ->write(' * @return '.$typehints['get_phpdoc'])
                 ->write(' */')
