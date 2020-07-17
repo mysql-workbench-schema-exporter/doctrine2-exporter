@@ -38,7 +38,7 @@ class Formatter extends BaseFormatter
 
     /**
      * (non-PHPdoc)
-     * @see \MwbExporter\Formatter::init()
+     * @see \MwbExporter\Formatter\Formatter::init()
      */
     protected function init()
     {
@@ -61,7 +61,7 @@ class Formatter extends BaseFormatter
 
     /**
      * (non-PHPdoc)
-     * @see \MwbExporter\Formatter::createTable()
+     * @see \MwbExporter\Formatter\Formatter::createTable()
      */
     public function createTable(Base $parent, $node)
     {
@@ -70,7 +70,7 @@ class Formatter extends BaseFormatter
 
     /**
      * (non-PHPdoc)
-     * @see \MwbExporter\FormatterInterface::getTitle()
+     * @see \MwbExporter\Formatter\Formatter::getTitle()
      */
     public function getTitle()
     {
@@ -79,7 +79,7 @@ class Formatter extends BaseFormatter
 
     /**
      * (non-PHPdoc)
-     * @see \MwbExporter\FormatterInterface::getFileExtension()
+     * @see \MwbExporter\Formatter\Formatter::getFileExtension()
      */
     public function getFileExtension()
     {

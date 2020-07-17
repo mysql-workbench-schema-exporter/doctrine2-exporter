@@ -84,7 +84,7 @@ class Table extends BaseTable
      * http://framework.zend.com/manual/2.1/en/modules/zend.input-filter.intro.html
      * 
      * @param \MwbExporter\Writer\WriterInterface $writer
-     * @return \MwbExporter\Formatter\Doctrine2\AnnotationZF2InputFilter\Model\Table
+     * @return \MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation\Model\Table
      */
     public function writeInputFilter(WriterInterface $writer)
     {
@@ -248,7 +248,7 @@ class Table extends BaseTable
      * 
      * @see \Zend\Stdlib\Hydrator\ArraySerializable::extract()
      * @param \MwbExporter\Writer\WriterInterface $writer
-     * @return \MwbExporter\Formatter\Doctrine2\AnnotationZF2InputFilter\Model\Table
+     * @return \MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation\Model\Table
      */
     public function writePopulate(WriterInterface $writer)
     {
@@ -292,7 +292,7 @@ class Table extends BaseTable
      * 
      * @see \Zend\Stdlib\Hydrator\ArraySerializable::hydrate()
      * @param \MwbExporter\Writer\WriterInterface $writer
-     * @return \MwbExporter\Formatter\Doctrine2\AnnotationZF2InputFilter\Model\Table
+     * @return \MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation\Model\Table
      */
     public function writeGetArrayCopy(WriterInterface $writer)
     {
