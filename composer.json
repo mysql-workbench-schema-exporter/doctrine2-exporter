@@ -27,11 +27,20 @@
 	],
 	"require" : {
 		"php" : ">=5.4.0",
-		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "^3.0 || dev-master"
+		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "dev-master"
 	},
 	"autoload" : {
 		"psr-4" : {
-			"MwbExporter\\Formatter\\Doctrine2\\" : "lib/MwbExporter/Formatter/Doctrine2/"
+			"MwbExporter\\Formatter\\Doctrine2\\" : "lib/"
+		}
+	},
+	"extra": {
+		"mysql-workbench-schema-exporter" : {
+			"formatters" : {
+				"doctrine2-annotation" : "MwbExporter\\Formatter\\Doctrine2\\Annotation\\Formatter",
+				"doctrine2-yaml" : "MwbExporter\\Formatter\\Doctrine2\\Yaml\\Formatter",
+				"doctrine2-zf2inputfilterannotation" : "MwbExporter\\Formatter\\Doctrine2\\ZF2InputFilterAnnotation\\Formatter"
+			}
 		}
 	}
 }
