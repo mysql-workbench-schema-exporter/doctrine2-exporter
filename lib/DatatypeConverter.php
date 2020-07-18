@@ -47,7 +47,7 @@ class DatatypeConverter extends BaseDatatypeConverter
             static::DATATYPE_NCHAR              => 'string',
             static::DATATYPE_VARCHAR            => 'string',
             static::DATATYPE_NVARCHAR           => 'string',
-            static::DATATYPE_JSON               => 'json',
+            static::DATATYPE_JSON               => 'array',
             static::DATATYPE_BINARY             => 'blob',
             static::DATATYPE_VARBINARY          => 'blob',
             static::DATATYPE_TINYTEXT           => 'text',
@@ -95,7 +95,6 @@ class DatatypeConverter extends BaseDatatypeConverter
             static::USERDATATYPE_NUMERIC        => 'decimal',
             static::USERDATATYPE_DEC            => 'decimal',
             static::USERDATATYPE_CHARACTER      => 'string',
-            static::USERDATATYPE_JSON           => 'array',
         ));
     }
 
