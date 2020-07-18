@@ -185,42 +185,40 @@ class Column extends BaseColumn
 
     protected function typehint($type, $nullable)
     {
-        if (null === $type) {
-            return '';
+        if (strlen($type)) {
+            $type = strtr($type, array('integer' => 'int', 'boolean' => 'bool'));
+            if ($this->getConfig()->get(Formatter::CFG_PHP7_TYPEHINTS)) {
+                if ($nullable || '\DateTime' === $type) {
+                    $type = '?'.$type;
+                }
+            }
         }
 
-        return ($nullable || '\DateTime' === $type ? '?' : '').str_replace(array('integer', 'boolean'), array('int', 'bool'), $type);
+        return $type;
+    }
+
+    protected function isTypehintSkipped()
+    {
+        return in_array($this->getTable()->getName().'.'.$this->getColumnName(), $this->getConfig()->get(Formatter::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS));
     }
 
     protected function paramTypehint($type, $nullable)
     {
-        if (
-            null === $type ||
-            !$this->getConfig()->get(Formatter::CFG_PHP7_ARG_TYPEHINTS) ||
-            in_array(
-                $this->getTable()->getName().'.'.$this->getColumnName(),
-                $this->getConfig()->get(Formatter::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS)
-            )
-        ) {
-            return '';
+        if ($this->getConfig()->get(Formatter::CFG_PHP7_TYPEHINTS) &&
+            $this->getConfig()->get(Formatter::CFG_PHP7_ARG_TYPEHINTS) &&
+            !$this->isTypehintSkipped() &&
+            strlen($type)) {
+            return $this->typehint($type, $nullable).' ';
         }
-
-        return $this->typehint($type, $nullable).' ';
     }
 
     protected function returnTypehint($type, $nullable)
     {
-        if (
-            null === $type ||
-            !$this->getConfig()->get(Formatter::CFG_PHP7_RETURN_TYPEHINTS) ||
-            in_array(
-                $this->getTable()->getName().'.'.$this->getColumnName(),
-                $this->getConfig()->get(Formatter::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS)
-            )
-        ) {
-            return '';
+        if ($this->getConfig()->get(Formatter::CFG_PHP7_TYPEHINTS) &&
+            $this->getConfig()->get(Formatter::CFG_PHP7_RETURN_TYPEHINTS) &&
+            !$this->isTypehintSkipped() &&
+            strlen($type)) {
+            return ': '.$this->typehint($type, $nullable);
         }
-
-        return ': '.$this->typehint($type, $nullable);
     }
 }
