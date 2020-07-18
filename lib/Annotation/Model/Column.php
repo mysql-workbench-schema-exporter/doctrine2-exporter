@@ -27,6 +27,7 @@
 
 namespace MwbExporter\Formatter\Doctrine2\Annotation\Model;
 
+use MwbExporter\Formatter\DatatypeConverterInterface;
 use MwbExporter\Formatter\Doctrine2\Model\Column as BaseColumn;
 use MwbExporter\Formatter\Doctrine2\Annotation\Formatter;
 use MwbExporter\Writer\WriterInterface;
@@ -38,7 +39,7 @@ class Column extends BaseColumn
         if (is_null($defaultValue) || 'CURRENT_TIMESTAMP' == $defaultValue) {
             $defaultValue = '';
         } else {
-            if ($this->getColumnType() == 'com.mysql.rdbms.mysql.datatype.varchar') {
+            if ($this->getColumnType() == DatatypeConverterInterface::DATATYPE_VARCHAR) {
                 $defaultValue = " = $defaultValue";
             } elseif ($this->isBoolean()) {
                 $defaultValue = " = ".($defaultValue == 0 ? 'false' : 'true');
