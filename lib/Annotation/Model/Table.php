@@ -1119,13 +1119,17 @@ class Table extends BaseTable
 
     public function writeSerialization(WriterInterface $writer)
     {
+        $serialized = array();
+        foreach ($this->getColumns() as $column) {
+            if (!$column->isIgnored()) {
+                $serialized[] = sprintf('\'%s\'', $column->getColumnName());
+            }
+        }
         $writer
             ->write('public function __sleep()')
             ->write('{')
             ->indent()
-                ->write('return array(%s);', implode(', ', array_map(function($column) {
-                    return sprintf('\'%s\'', $column);
-                }, $this->getColumns()->getColumnNames())))
+                ->write('return array(%s);', implode(', ', $serialized))
             ->outdent()
             ->write('}')
         ;
