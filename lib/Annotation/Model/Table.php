@@ -261,7 +261,7 @@ class Table extends BaseTable
             ->write(' * '.$this->getNamespace(null, false))
             ->write(' *')
             ->writeIf($comment, $comment)
-            ->writeIf($extendableEntity, ' * @ORM\MappedSuperclass')
+            ->writeIf($extendableEntity, ' * '.$this->addPrefix('MappedSuperclass'))
             ->writeIf($hasDeletableBehaviour,
                     ' * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false, hardDelete=false)')
             ->writeIf(!$extendableEntity,
@@ -274,7 +274,7 @@ class Table extends BaseTable
                     ' * '.$this->getAnnotation('DiscriminatorColumn', $this->getInheritanceDiscriminatorColumn()))
             ->writeIf($extendableEntityHasDiscriminator,
                     ' * '.$this->getAnnotation('DiscriminatorMap', array($this->getInheritanceDiscriminatorMap())))
-            ->writeIf($lifecycleCallbacks, ' * @HasLifecycleCallbacks')
+            ->writeIf($lifecycleCallbacks, ' * '.$this->addPrefix('HasLifecycleCallbacks'))
             ->writeIf($useBehavioralExtensions && strstr($this->getClassName($extendableEntity), 'Img'),
                     ' * @Gedmo\Uploadable(path="./public/upload/' . $this->getClassName($extendableEntity) . '", filenameGenerator="SHA1", allowOverwrite=true, appendNumber=true)')
             ->write(' */')
@@ -293,7 +293,7 @@ class Table extends BaseTable
                         foreach ($handlers as $handler) {
                             $writer
                                 ->write('/**')
-                                ->write(' * @%s', ucfirst($callback))
+                                ->write(' * '.$this->addPrefix(ucfirst($callback)))
                                 ->write(' */')
                                 ->write('public function %s()', $handler)
                                 ->write('{')
