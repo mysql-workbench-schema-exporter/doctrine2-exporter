@@ -96,6 +96,11 @@ abstract class Formatter extends BaseFormatter
         ));
     }
 
+    public function getVersion()
+    {
+        return 'dev';
+    }
+
     /**
      * (non-PHPdoc)
      * @see \MwbExporter\Formatter\Formatter::createDatatypeConverter()
