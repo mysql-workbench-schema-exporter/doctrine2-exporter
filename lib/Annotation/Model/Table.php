@@ -387,7 +387,7 @@ class Table extends BaseTable
     protected function getClassToExtend()
     {
         $class = $this->getConfig()->get(Formatter::CFG_EXTENDS_CLASS);
-        if(empty($class)) {
+        if (empty($class)) {
             return '';
         }
 
@@ -402,7 +402,7 @@ class Table extends BaseTable
     protected function getInterfaceToImplement()
     {
         $interface = $this->getClassImplementations();
-        if(empty($interface)) {
+        if (empty($interface)) {
             return '';
         }
 
@@ -787,7 +787,7 @@ class Table extends BaseTable
                 $related = $local->getForeignM2MRelatedName();
                 $related_text = $local->getForeignM2MRelatedName(false);
 
-                $typehints = [
+                $typehints = array(
                     'add_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), false),
                     'add_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'add_arg' => $this->paramTypehint($local->getOwningTable()->getNamespace(), false),
@@ -799,9 +799,8 @@ class Table extends BaseTable
                     'remove_return' => $this->returnTypehint(null, false),
 
                     'get_phpdoc' => $this->typehint($this->getCollectionInterface(), false),
-//                    'get_return' => $this->returnTypehint($this->getCollectionInterface(), false),
                     'get_return' => $this->returnTypehint(null, false),
-                ];
+                );
 
                 $writer
                     // setter
@@ -861,7 +860,7 @@ class Table extends BaseTable
                     $nullable = $nullable && $lc->isNotNull();
                 }
 
-                $typehints = [
+                $typehints = array(
                     'set_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), $nullable),
                     'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'set_arg' => $this->paramTypehint($local->getOwningTable()->getNamespace(), $nullable),
@@ -869,7 +868,7 @@ class Table extends BaseTable
 
                     'get_phpdoc' => $this->typehint($local->getOwningTable()->getNamespace(), $nullable),
                     'get_return' => $this->returnTypehint($local->getOwningTable()->getNamespace(), true),
-                ];
+                );
 
                 $writer
                     // setter
@@ -926,7 +925,7 @@ class Table extends BaseTable
                     $nullable = $nullable && $lc->isNotNull();
                 }
 
-                $typehints = [
+                $typehints = array(
                     'set_phpdoc_arg' => $this->typehint($foreign->getReferencedTable()->getNamespace(), true),
                     'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'set_arg' => $this->paramTypehint($foreign->getReferencedTable()->getNamespace(), true),
@@ -934,7 +933,7 @@ class Table extends BaseTable
 
                     'get_phpdoc' => $this->typehint($foreign->getReferencedTable()->getNamespace(), true),
                     'get_return' => $this->returnTypehint($foreign->getReferencedTable()->getNamespace(), true),
-                ];
+                );
 
                 $writer
                     // setter
@@ -976,7 +975,7 @@ class Table extends BaseTable
                     $nullable = $nullable && $lc->isNotNull();
                 }
 
-                $typehints = [
+                $typehints = array(
                     'set_phpdoc_arg' => $this->typehint($foreign->getReferencedTable()->getNamespace(), $nullable),
                     'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'set_arg' => $this->paramTypehint($foreign->getReferencedTable()->getNamespace(), $nullable),
@@ -984,7 +983,7 @@ class Table extends BaseTable
 
                     'get_phpdoc' => $this->typehint($foreign->getReferencedTable()->getNamespace(), $nullable),
                     'get_return' => $this->returnTypehint($foreign->getReferencedTable()->getNamespace(), true),
-                ];
+                );
 
                 $writer
                     // setter
@@ -1031,7 +1030,7 @@ class Table extends BaseTable
 
             $isOwningSide = $this->getFormatter()->isOwningSide($relation, $fk2);
 
-            $typehints = [
+            $typehints = array(
                 'add_phpdoc_arg' => $this->typehint($relation['refTable']->getNamespace(), false),
                 'add_phpdoc_return' => $this->typehint($this->getNamespace($this->getModelName()), false),
                 'add_arg' => $this->paramTypehint($relation['refTable']->getNamespace(), false),
@@ -1043,9 +1042,8 @@ class Table extends BaseTable
                 'remove_return' => $this->returnTypehint(null, false),
 
                 'get_phpdoc' => $this->typehint($this->getCollectionInterface(), false),
-//                'get_return' => $this->returnTypehint($this->getCollectionInterface(), false),
                 'get_return' => $this->returnTypehint(null, false),
-            ];
+            );
 
             $writer
                 ->write('/**')
@@ -1135,16 +1133,16 @@ class Table extends BaseTable
         return $this;
     }
 
-    protected function typehint(?string $type, bool $nullable): string
+    protected function typehint($type, $nullable)
     {
         if (null === $type) {
             return '';
         }
 
-        return ($nullable ? '?' : '').str_replace(['integer', 'boolean'], ['int', 'bool'], $type);
+        return ($nullable ? '?' : '').str_replace(array('integer', 'boolean'), array('int', 'bool'), $type);
     }
 
-    protected function paramTypehint(?string $type, bool $nullable): string
+    protected function paramTypehint($type, $nullable)
     {
         if (null === $type || !$this->getConfig()->get(Formatter::CFG_PHP7_ARG_TYPEHINTS)) {
             return '';
@@ -1153,7 +1151,7 @@ class Table extends BaseTable
         return $this->typehint($type, $nullable).' ';
     }
 
-    protected function returnTypehint(?string $type, bool $nullable): string
+    protected function returnTypehint($type, $nullable)
     {
         if (null === $type || !$this->getConfig()->get(Formatter::CFG_PHP7_RETURN_TYPEHINTS)) {
             return '';

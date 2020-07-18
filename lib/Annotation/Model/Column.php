@@ -95,7 +95,7 @@ class Column extends BaseColumn
             $converter = $this->getFormatter()->getDatatypeConverter();
             $nativeType = $converter->getNativeType($converter->getMappedType($this));
 
-            $typehints = [
+            $typehints = array(
                 'set_phpdoc_arg' => $this->typehint($nativeType, !$this->isNotNull()),
                 'set_phpdoc_return' => $this->typehint($table->getNamespace(), false),
                 'set_arg' => $this->paramTypehint($nativeType, !$this->isNotNull()),
@@ -103,7 +103,7 @@ class Column extends BaseColumn
 
                 'get_phpdoc' => $this->typehint($nativeType, !$this->isNotNull()),
                 'get_return' => $this->returnTypehint($nativeType, null === $this->getDefaultValue() ? true : !$this->isNotNull()),
-            ];
+            );
 
             $writer
                 // setter
@@ -183,16 +183,16 @@ class Column extends BaseColumn
         return $attributes;
     }
 
-    protected function typehint(?string $type, bool $nullable): string
+    protected function typehint($type, $nullable)
     {
         if (null === $type) {
             return '';
         }
 
-        return ($nullable || '\DateTime' === $type ? '?' : '').str_replace(['integer', 'boolean'], ['int', 'bool'], $type);
+        return ($nullable || '\DateTime' === $type ? '?' : '').str_replace(array('integer', 'boolean'), array('int', 'bool'), $type);
     }
 
-    protected function paramTypehint(?string $type, bool $nullable): string
+    protected function paramTypehint($type, $nullable)
     {
         if (
             null === $type ||
@@ -208,7 +208,7 @@ class Column extends BaseColumn
         return $this->typehint($type, $nullable).' ';
     }
 
-    protected function returnTypehint(?string $type, bool $nullable): string
+    protected function returnTypehint($type, $nullable)
     {
         if (
             null === $type ||

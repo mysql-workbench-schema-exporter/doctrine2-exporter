@@ -147,7 +147,7 @@ abstract class Formatter extends BaseFormatter
         $cascadeValue = array_map('strtolower', array_map('trim', explode(',', $cascadeValue)));
         $cascadeValue = array_intersect($cascadeValue, $validator->getChoices());
         $cascadeValue = array_filter($cascadeValue);
-        if(empty($cascadeValue)) {
+        if (empty($cascadeValue)) {
             return null;
         }
 
