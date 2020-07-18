@@ -47,7 +47,7 @@ class Column extends BaseColumn
         if ($this->isNullableRequired()) {
             $values['nullable'] = $this->getNullableValue();
         }
-        if($this->isUnsigned()) {
+        if ($this->isUnsigned()) {
             $values['unsigned'] = true;
         }
         if ($this->isAutoIncrement()) {

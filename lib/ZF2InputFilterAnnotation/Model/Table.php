@@ -204,7 +204,7 @@ class Table extends BaseTable
                                 ),
                             ),
                         )', $column->isNotNull()?'1':'0');
-                    }else {
+                    } else {
                         $s_validators = 'array()';
                     }
                     break;
@@ -219,11 +219,11 @@ class Table extends BaseTable
                 $s_validators = 'array(
                             array(\'name\' => \'Zend\I18n\Validator\PhoneNumber\')
                         )';
-            }elseif (strstr($column->getColumnName(), 'email')){
+            } elseif (strstr($column->getColumnName(), 'email')){
                 $s_validators = 'array(
                             array(\'name\' => \'Zend\Validator\EmailAddress\')
                         )';
-            }elseif (strstr($column->getColumnName(), 'postcode') or strstr($column->getColumnName(), '_zip')){
+            } elseif (strstr($column->getColumnName(), 'postcode') or strstr($column->getColumnName(), '_zip')){
                 $s_validators = 'array(
                             array(\'name\' => \'Zend\I18n\Validator\PostCode\')
                         )';
