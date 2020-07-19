@@ -76,6 +76,11 @@ class Formatter extends BaseFormatter
                 static::QUOTE_IDENTIFIER_NONE,
             )),
         ));
+        $this->addDependency(array(
+            static::CFG_PHP7_ARG_TYPEHINTS,
+            static::CFG_PHP7_RETURN_TYPEHINTS,
+            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS,
+        ), static::CFG_PHP7_TYPEHINTS, true);
     }
 
     /**
