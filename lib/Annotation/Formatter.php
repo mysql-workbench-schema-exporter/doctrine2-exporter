@@ -34,6 +34,8 @@ use MwbExporter\Validator\ChoiceValidator;
 class Formatter extends BaseFormatter
 {
     const CFG_ANNOTATION_PREFIX                     = 'useAnnotationPrefix';
+    const CFG_NAMING_STRATEGY                       = 'namingStrategy';
+    const CFG_QUOTE_IDENTIFIER_STRATEGY             = 'quoteIdentifierStrategy';
     const CFG_EXTENDS_CLASS                         = 'extendsClass';
     const CFG_PHP7_TYPEHINTS                        = 'php7Typehints';
     const CFG_PHP7_ARG_TYPEHINTS                    = 'php7ArgTypehints';
@@ -43,8 +45,11 @@ class Formatter extends BaseFormatter
     const CFG_GENERATE_ENTITY_SERIALIZATION         = 'generateEntitySerialization';
     const CFG_GENERATE_EXTENDABLE_ENTITY            = 'generateExtendableEntity';
     const CFG_EXTENDABLE_ENTITY_HAS_DISCRIMINATOR   = 'extendableEntityHasDiscriminator';
-    const CFG_QUOTE_IDENTIFIER_STRATEGY             = 'quoteIdentifierStrategy';
     const CFG_USE_BEHAVIORAL_EXTENSIONS             = 'useBehavioralExtensions';
+
+    const NAMING_AS_IS                              = 'as-is';
+    const NAMING_CAMEL_CASE                         = 'camel-case';
+    const NAMING_PASCAL_CASE                        = 'pascal-case';
 
     const QUOTE_IDENTIFIER_AUTO                     = 'auto';
     const QUOTE_IDENTIFIER_ALWAYS                   = 'always';
@@ -61,15 +66,21 @@ class Formatter extends BaseFormatter
             static::CFG_GENERATE_ENTITY_SERIALIZATION       => true,
             static::CFG_GENERATE_EXTENDABLE_ENTITY          => false,
             static::CFG_EXTENDABLE_ENTITY_HAS_DISCRIMINATOR => true,
-            static::CFG_USE_BEHAVIORAL_EXTENSIONS           => false,
+            static::CFG_NAMING_STRATEGY                     => static::NAMING_AS_IS,
             static::CFG_QUOTE_IDENTIFIER_STRATEGY           => static::QUOTE_IDENTIFIER_AUTO,
             static::CFG_EXTENDS_CLASS                       => '',
+            static::CFG_USE_BEHAVIORAL_EXTENSIONS           => false,
             static::CFG_PHP7_TYPEHINTS                      => false,
             static::CFG_PHP7_ARG_TYPEHINTS                  => true,
             static::CFG_PHP7_RETURN_TYPEHINTS               => true,
             static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS      => array(),
         ));
         $this->addValidators(array(
+            static::CFG_NAMING_STRATEGY                     => new ChoiceValidator(array(
+                static::NAMING_AS_IS,
+                static::NAMING_CAMEL_CASE,
+                static::NAMING_PASCAL_CASE,
+            )),
             static::CFG_QUOTE_IDENTIFIER_STRATEGY           => new ChoiceValidator(array(
                 static::QUOTE_IDENTIFIER_AUTO,
                 static::QUOTE_IDENTIFIER_ALWAYS,

@@ -34,6 +34,13 @@ use MwbExporter\Writer\WriterInterface;
 
 class Column extends BaseColumn
 {
+    public function getColumnName($raw = true)
+    {
+        $name = parent::getColumnName();
+
+        return $raw ? $name : $this->getTable()->getNaming($name);
+    }
+
     private function getStringDefaultValue() {
         $defaultValue = $this->getDefaultValue();
         if (is_null($defaultValue) || 'CURRENT_TIMESTAMP' == $defaultValue) {
@@ -57,6 +64,7 @@ class Column extends BaseColumn
             $useBehavioralExtensions = $this->getConfig()->get(Formatter::CFG_USE_BEHAVIORAL_EXTENSIONS);
             $isBehavioralColumn = strstr($this->getTable()->getName(), '_img') && $useBehavioralExtensions;
             $comment = $this->getComment();
+            $columnName = $this->getColumnName(false);
             $writer
                 ->write('/**')
                 ->writeIf($comment, $comment)
@@ -78,7 +86,7 @@ class Column extends BaseColumn
                 ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'size'),
                         ' * @Gedmo\UploadableFileSize')
                 ->write(' */')
-                ->write('protected $'.$this->getColumnName().$this->getStringDefaultValue().';')
+                ->write('protected $'.$columnName.$this->getStringDefaultValue().';')
                 ->write('')
             ;
         }
@@ -94,6 +102,7 @@ class Column extends BaseColumn
             $table = $this->getTable();
             $converter = $this->getFormatter()->getDatatypeConverter();
             $nativeType = $converter->getNativeType($converter->getMappedType($this));
+            $columnName = $this->getColumnName(false);
 
             $typehints = array(
                 'set_phpdoc_arg' => $this->typehint($nativeType, !$this->isNotNull()),
@@ -108,16 +117,16 @@ class Column extends BaseColumn
             $writer
                 // setter
                 ->write('/**')
-                ->write(' * Set the value of '.$this->getColumnName().'.')
+                ->write(' * Set the value of '.$columnName.'.')
                 ->write(' *')
-                ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$this->getColumnName())
+                ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$columnName)
                 ->write(' *')
                 ->write(' * @return '.$typehints['set_phpdoc_return'])
                 ->write(' */')
-                ->write('public function set'.$this->getBeautifiedColumnName().'('.$typehints['set_arg'].'$'.$this->getColumnName().')'.$typehints['set_return'])
+                ->write('public function set'.$this->getBeautifiedColumnName().'('.$typehints['set_arg'].'$'.$columnName.')'.$typehints['set_return'])
                 ->write('{')
                 ->indent()
-                    ->write('$this->'.$this->getColumnName().' = $'.$this->getColumnName().';')
+                    ->write('$this->'.$columnName.' = $'.$columnName.';')
                     ->write('')
                     ->write('return $this;')
                 ->outdent()
@@ -125,14 +134,14 @@ class Column extends BaseColumn
                 ->write('')
                 // getter
                 ->write('/**')
-                ->write(' * Get the value of '.$this->getColumnName().'.')
+                ->write(' * Get the value of '.$columnName.'.')
                 ->write(' *')
                 ->write(' * @return '.$typehints['get_phpdoc'])
                 ->write(' */')
                 ->write('public function '.$this->getColumnGetterName().'()'.$typehints['get_return'])
                 ->write('{')
                 ->indent()
-                    ->write('return $this->'.$this->getColumnName().';')
+                    ->write('return $this->'.$columnName.';')
                 ->outdent()
                 ->write('}')
                 ->write('')
@@ -147,8 +156,9 @@ class Column extends BaseColumn
      */
     public function asAnnotation()
     {
+        $columnName = $this->getColumnName(false);
         $attributes = array(
-            'name' => ($columnName = $this->getTable()->quoteIdentifier($this->getColumnName())) !== $this->getColumnName() ? $columnName : null,
+            'name' => ($quotedColumnName = $this->getTable()->quoteIdentifier($this->getColumnName())) !== $columnName ? $quotedColumnName : null,
             'type' => $this->getFormatter()->getDatatypeConverter()->getMappedType($this),
         );
         if (($length = $this->parameters->get('length')) && ($length != -1)) {
