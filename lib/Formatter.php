@@ -70,7 +70,7 @@ abstract class Formatter extends BaseFormatter
             static::CFG_REPOSITORY_NAMESPACE          => '',
             static::CFG_AUTOMATIC_REPOSITORY          => true,
             static::CFG_SKIP_COLUMN_WITH_RELATION     => false,
-            static::CFG_RELATED_VAR_NAME_FORMAT       => '%name%%related%',
+            static::CFG_RELATED_VAR_NAME_FORMAT       => '%name%_%related%',
             static::CFG_NULLABLE_ATTRIBUTE            => static::NULLABLE_AUTO,
             static::CFG_GENERATED_VALUE_STRATEGY      => static::GENERATED_VALUE_AUTO,
             static::CFG_DEFAULT_CASCADE               => false,

@@ -151,8 +151,7 @@ class Table extends BaseTable
         }
         if ($nameFromCommentTag) {
             $name = $nameFromCommentTag;
-        }
-        else {
+        } else {
             $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
         }
 
