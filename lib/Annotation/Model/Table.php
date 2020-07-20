@@ -34,7 +34,6 @@ use MwbExporter\Object\Annotation;
 use MwbExporter\Writer\WriterInterface;
 use MwbExporter\Helper\Comment;
 use MwbExporter\Helper\ReservedWords;
-use Doctrine\Common\Inflector\Inflector;
 
 class Table extends BaseTable
 {
