@@ -28,7 +28,6 @@ namespace MwbExporter\Formatter\Doctrine2\Model;
 
 use MwbExporter\Model\Table as BaseTable;
 use MwbExporter\Formatter\Doctrine2\Formatter;
-use Doctrine\Common\Inflector\Inflector;
 
 class Table extends BaseTable
 {
@@ -156,6 +155,6 @@ class Table extends BaseTable
             $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
         }
 
-        return $plural ? Inflector::pluralize($name) : $name;
+        return $plural ? $this->pluralize($name) : $name;
     }
 }

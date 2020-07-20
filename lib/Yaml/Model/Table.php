@@ -33,7 +33,6 @@ use MwbExporter\Model\ForeignKey;
 use MwbExporter\Writer\WriterInterface;
 use MwbExporter\Object\YAML;
 use MwbExporter\Helper\Comment;
-use Doctrine\Common\Inflector\Inflector;
 
 class Table extends BaseTable
 {
@@ -249,11 +248,7 @@ class Table extends BaseTable
                 'fetch'        => $this->getFormatter()->getFetchOption($fk1->parseComment('fetch')),
             );
 
-            $relationName = Inflector::camelize(
-                Inflector::pluralize(
-                    $relation['refTable']->getRawTableName()
-                )
-            );
+            $relationName = $this->getFormatter()->getInflector()->camelize($this->pluralize($relation['refTable']->getRawTableName()));
 
             // if this is the owning side, also output the JoinTable Annotation
             // otherwise use "mappedBy" feature
