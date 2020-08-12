@@ -160,13 +160,13 @@ class Table extends BaseTable
                 $this->getDocument()->addLog('  Relation considered as "1 <=> N"');
 
                 $type = 'oneToMany';
-                $relationName = lcfirst($this->getRelatedVarName($targetEntity, $related, true));
+                $relationName = lcfirst($this->getRelatedVarName($targetEntity, $related, true, $local));
                 if (!isset($values[$type])) {
                     $values[$type] = array();
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity'  => $targetEntity,
-                    'mappedBy'      => lcfirst($this->getRelatedVarName($mappedBy, $related)),
+                    'mappedBy'      => lcfirst($this->getRelatedVarName($mappedBy, $related, false, $local)),
                     'cascade'       => $this->getFormatter()->getCascadeOption($local->parseComment('cascade')),
                     'fetch'         => $this->getFormatter()->getFetchOption($local->parseComment('fetch')),
                     'orphanRemoval' => $this->getFormatter()->getBooleanOption($local->parseComment('orphanRemoval')),
@@ -181,7 +181,7 @@ class Table extends BaseTable
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity' => $targetEntity,
-                    'mappedBy'   => lcfirst($this->getRelatedVarName($mappedBy, $related)),
+                    'mappedBy'   => lcfirst($this->getRelatedVarName($mappedBy, $related, false, $local)),
                 ), $this->getJoins($local));
             }
             if (!is_null($cacheMode = $this->getFormatter()->getCacheOption($local->parseComment('cache')))) {
@@ -205,13 +205,13 @@ class Table extends BaseTable
                 $this->getDocument()->addLog('  Relation considered as "N <=> 1"');
 
                 $type = 'manyToOne';
-                $relationName = lcfirst($this->getRelatedVarName($targetEntity, $related));
+                $relationName = lcfirst($this->getRelatedVarName($targetEntity, $related, false, $foreign));
                 if (!isset($values[$type])) {
                     $values[$type] = array();
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity'  => $targetEntityFQCN,
-                    'inversedBy'    => lcfirst($this->getRelatedVarName($inversedBy, $related, true)),
+                    'inversedBy'    => lcfirst($this->getRelatedVarName($inversedBy, $related, true, $foreign)),
                 ), $this->getJoins($foreign, false));
             } else {
                 $this->getDocument()->addLog('  Relation considered as "1 <=> 1"');
@@ -223,7 +223,7 @@ class Table extends BaseTable
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity'  => $targetEntityFQCN,
-                    'inversedBy'    => $foreign->isUnidirectional() ? null : lcfirst($this->getRelatedVarName($inversedBy, $related)),
+                    'inversedBy'    => $foreign->isUnidirectional() ? null : lcfirst($this->getRelatedVarName($inversedBy, $related, false, $foreign)),
                 ), $this->getJoins($foreign, false));
             }
             if (!is_null($cacheMode = $this->getFormatter()->getCacheOption($foreign->parseComment('cache')))) {

@@ -26,6 +26,7 @@
 
 namespace MwbExporter\Formatter\Doctrine2\Model;
 
+use MwbExporter\Model\ForeignKey;
 use MwbExporter\Model\Table as BaseTable;
 use MwbExporter\Formatter\Doctrine2\Formatter;
 
@@ -127,11 +128,67 @@ class Table extends BaseTable
      *
      * @param string $name  Identifier name
      * @param string $related  Related name
-     * @param string $plural  Return plural form
+     * @param boolean $plural  Return plural form
+     * @param ForeignKey $foreign The foreign key object
+     * @param boolean $useM2OneName For foreign keys that have the relationNames tag, a flag to return the Many2One name
      * @return string
      */
-    public function getRelatedVarName($name, $related = null, $plural = false)
+    public function getRelatedVarName($name, $related = null, $plural = false, ForeignKey $foreign = null, $useM2OneName = false)
     {
+
+        if ($foreign && $foreign->parseComment('relationNames')) {
+
+            /**
+             * If the foreign key is specified and it has a `relationNames` tag in the comments, use the values from this tag
+             */
+
+            list($oneToManyName, $manyToOneName) = explode(':', $foreign->parseComment('relationNames'), 2);
+
+            if ($oneToManyName && $manyToOneName) {
+                // Both names must be specified, otherwise the comment tag is not considered valid
+
+                if ($useM2OneName) {
+                    //the M2One name is requested - needed for the add/remove to collection methods
+                    $name = $manyToOneName;
+                }
+                else {
+                    //If the plural flag is sent, it means the M2One relation name is requested
+                    if (!$plural) {
+                        //this would be the name of the field in the model that has a foreign key (one-to-many relation)
+                        $name = $oneToManyName;
+                    } else {
+                        //this would be the name of the field in the model that is referenced by the foreign key (it as a many-to-one relation)
+                        $name = $manyToOneName;
+                    }
+                }
+
+                return $plural ? $this->pluralize($name) : $this->singularize($name);
+            }
+        }
+
+        /**
+         * Check if the foreign key is from a m2m table and if so, parse the `relatedNames` tag to check for custom relation names
+         */
+
+        if ($foreign && ($m2mTable = $foreign->getTable())->isManyToMany()) {
+            $nameFromCommentTag = '';
+            $relatedNames = trim($m2mTable->parseComment('relatedNames'));
+
+            if ('' !== $relatedNames) {
+                foreach (explode("\n", $relatedNames) as $relationMap) {
+                    list($toChange, $replacement) = explode(':', $relationMap, 2);
+                    if ($name === $toChange) {
+                        $nameFromCommentTag = $replacement;
+                        break;
+                    }
+                }
+                if ($nameFromCommentTag) {
+                    return $plural ? $this->pluralize($nameFromCommentTag) : $this->singularize($nameFromCommentTag);
+                }
+            }
+        }
+
+
         /**
          * if $name does not match the current ModelName (in case a relation column), check if the table comment includes the `relatedNames` tag
          * and parse that to see if for $name was provided a custom value
@@ -149,12 +206,14 @@ class Table extends BaseTable
                 }
             }
         }
+
         if ($nameFromCommentTag) {
             $name = $nameFromCommentTag;
         } else {
             $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
+
         }
 
-        return $plural ? $this->pluralize($name) : $name;
+        return $plural ? $this->pluralize($name) : $this->singularize($name);
     }
 }

@@ -539,7 +539,7 @@ class Table extends BaseTable
 
             $annotationOptions = array(
                 'targetEntity' => $targetEntityFQCN,
-                'mappedBy' => $this->getNaming($local->getOwningTable()->getRelatedVarName($mappedBy, $related)),
+                'mappedBy' => $this->getNaming($local->getOwningTable()->getRelatedVarName($mappedBy, $related, false, $local)),
                 'cascade' => $this->getFormatter()->getCascadeOption($local->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($local->parseComment('fetch')),
                 'orphanRemoval' => $this->getFormatter()->getBooleanOption($local->parseComment('orphanRemoval')),
@@ -547,6 +547,8 @@ class Table extends BaseTable
 
             if ($local->isManyToOne()) {
                 $this->getDocument()->addLog('  Relation considered as "1 <=> N"');
+
+                $variableName = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true, $local));
 
                 $writer
                     ->write('/**')
@@ -561,7 +563,7 @@ class Table extends BaseTable
                         }
                     })
                     ->write(' */')
-                    ->write('protected $'.$this->getNaming($this->getRelatedVarName($targetEntity, $related, true)).';')
+                    ->write('protected $'.$variableName.';')
                     ->write('')
                 ;
             } else {
@@ -594,7 +596,7 @@ class Table extends BaseTable
 
             $annotationOptions = array(
                 'targetEntity' => $targetEntityFQCN,
-                'inversedBy' => $foreign->isUnidirectional() ? null : $this->getNaming($this->getRelatedVarName($inversedBy, $related, true)),
+                'inversedBy' => $foreign->isUnidirectional() ? null : $this->getNaming($this->getRelatedVarName($inversedBy, $related, true, $foreign)),
                 'cascade' => $this->getFormatter()->getCascadeOption($foreign->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($foreign->parseComment('fetch')),
             );
@@ -603,20 +605,22 @@ class Table extends BaseTable
             if ($foreign->isManyToOne()) {
                 $this->getDocument()->addLog('  Relation considered as "N <=> 1"');
 
+                $variableName = $this->getNaming($this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related, false, $foreign));
+
                 $writer
                     ->write('/**')
                     ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
                     ->write(' * '.$this->getAnnotation('ManyToOne', $annotationOptions))
                     ->write(' * '.$this->getJoins($foreign, false))
                     ->write(' */')
-                    ->write('protected $'.$this->getNaming($this->getRelatedVarName($targetEntity, $related)).';')
+                    ->write('protected $'.$variableName.';')
                     ->write('')
                 ;
             } else {
                 $this->getDocument()->addLog('  Relation considered as "1 <=> 1"');
 
                 if (null !== $annotationOptions['inversedBy']) {
-                    $annotationOptions['inversedBy'] = $this->getNaming($this->getRelatedVarName($inversedBy, $related));
+                    $annotationOptions['inversedBy'] = $this->getNaming($this->getRelatedVarName($inversedBy, $related, false, $foreign));
                 }
                 $annotationOptions['cascade'] = $this->getFormatter()->getCascadeOption($foreign->parseComment('cascade'));
 
@@ -641,11 +645,13 @@ class Table extends BaseTable
             $this->getDocument()->addLog(sprintf('  Writing setter/getter for N <=> N "%s"', $relation['refTable']->getModelName()));
 
             $fk1 = $relation['reference'];
+            $fk2 = null;
+
             $isOwningSide = $this->getFormatter()->isOwningSide($relation, $fk2);
             $annotationOptions = array(
                 'targetEntity' => $relation['refTable']->getModelNameAsFQCN(),
                 'mappedBy' => null,
-                'inversedBy' => $this->getNaming($this->getPluralName()),
+                'inversedBy' => $this->getNaming($this->getRelatedVarName($this->getModelName(), null, true, $fk1)),
                 'cascade' => $this->getFormatter()->getCascadeOption($fk1->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($fk1->parseComment('fetch')),
             );
@@ -695,8 +701,10 @@ class Table extends BaseTable
                     ->write(' */')
                 ;
             }
+
+            $variableName = $this->getNaming($this->getRelatedVarName($relation['refTable']->getModelName(), null, true, $fk1));
             $writer
-                ->write('protected $'.$this->getNaming($relation['refTable']->getPluralName()).';')
+                ->write('protected $'.$variableName.';')
                 ->write('')
             ;
         }
@@ -741,15 +749,22 @@ class Table extends BaseTable
             $this->getDocument()->addLog(sprintf('  Writing N <=> 1 constructor "%s"', $local->getOwningTable()->getModelName()));
 
             $related = $local->getForeignM2MRelatedName();
-            $writer->write('$this->%s = new %s();', $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getName(), $related, true)), $this->getCollectionClass(false));
+            $variableName = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true, $local));
+            $writer->write('$this->%s = new %s();', $variableName, $this->getCollectionClass(false));
         }
     }
 
     public function writeManyToManyConstructor(WriterInterface $writer)
     {
         foreach ($this->getTableM2MRelations() as $relation) {
+
+            $fk1 = $relation['reference'];
+
             $this->getDocument()->addLog(sprintf('  Writing M2M constructor "%s"', $relation['refTable']->getModelName()));
-            $writer->write('$this->%s = new %s();', $this->getNaming($relation['refTable']->getPluralName()), $this->getCollectionClass(false));
+            $variableName = $this->getNaming($this->getRelatedVarName($relation['refTable']->getModelName(), null, true, $fk1));
+            $writer->write('$this->%s = new %s();', $variableName, $this->getCollectionClass(false));
+
+
         }
     }
 
@@ -785,8 +800,11 @@ class Table extends BaseTable
 
                 $related = $local->getForeignM2MRelatedName();
                 $related_text = $local->getForeignM2MRelatedName(false);
-                $nameSingular = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related), Formatter::NAMING_PASCAL_CASE);
-                $namePlural = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true), Formatter::NAMING_PASCAL_CASE);
+                $nameSingular = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, false, $local, true));
+                $namePlural = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true, $local));
+
+                $variableNameSingular = $nameSingular;
+                $variableNamePlural = $namePlural;
 
                 $typehints = array(
                     'add_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), false),
@@ -808,14 +826,14 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Add '.trim($local->getOwningTable()->getModelName().' entity '.$related_text). ' to collection (one to many).')
                     ->write(' *')
-                    ->write(' * @param '.$typehints['add_phpdoc_arg'].' $'.$this->getNaming($local->getOwningTable()->getName()))
+                    ->write(' * @param '.$typehints['add_phpdoc_arg'].' $'.$variableNameSingular)
                     ->write(' *')
                     ->write(' * @return '.$typehints['add_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function add'.$nameSingular.'('.$typehints['add_arg'].'$'.$this->getNaming($local->getOwningTable()->getName()).')'.$typehints['add_return'])
+                    ->write('public function add'.ucfirst($nameSingular).'('.$typehints['add_arg'].'$'.$variableNameSingular.')'.$typehints['add_return'])
                     ->write('{')
                     ->indent()
-                        ->write('$this->'.$this->getNaming($this->getRelatedVarName($local->getOwningTable()->getName(), $related, true)).'[] = $'.$this->getNaming($local->getOwningTable()->getName()).';')
+                        ->write('$this->'.$variableNamePlural.'[] = $'.$variableNameSingular.';')
                         ->write('')
                         ->write('return $this;')
                     ->outdent()
@@ -825,14 +843,14 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Remove '.trim($local->getOwningTable()->getModelName().' entity '.$related_text). ' from collection (one to many).')
                     ->write(' *')
-                    ->write(' * @param '.$typehints['remove_phpdoc_arg'].' $'.$this->getNaming($local->getOwningTable()->getName()))
+                    ->write(' * @param '.$typehints['remove_phpdoc_arg'].' $'.$variableNameSingular)
                     ->write(' *')
                     ->write(' * @return '.$typehints['remove_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function remove'.$nameSingular.'('.$typehints['remove_arg'].'$'.$this->getNaming($local->getOwningTable()->getName()).')'.$typehints['remove_return'])
+                    ->write('public function remove'.ucfirst($nameSingular).'('.$typehints['remove_arg'].'$'.$variableNameSingular.')'.$typehints['remove_return'])
                     ->write('{')
                     ->indent()
-                        ->write('$this->'.$this->getNaming($this->getRelatedVarName($local->getOwningTable()->getName(), $related, true)).'->removeElement($'.$this->getNaming($local->getOwningTable()->getName()).');')
+                        ->write('$this->'.$variableNamePlural.'->removeElement($'.$variableNameSingular.');')
                         ->write('')
                         ->write('return $this;')
                     ->outdent()
@@ -844,10 +862,10 @@ class Table extends BaseTable
                     ->write(' *')
                     ->write(' * @return '.$typehints['get_phpdoc'])
                     ->write(' */')
-                    ->write('public function get'.$namePlural.'()'.$typehints['get_return'])
+                    ->write('public function get'.ucfirst($namePlural).'()'.$typehints['get_return'])
                     ->write('{')
                     ->indent()
-                        ->write('return $this->'.$this->getNaming($this->getRelatedVarName($local->getOwningTable()->getName(), $related, true)).';')
+                        ->write('return $this->'.$variableNamePlural.';')
                     ->outdent()
                     ->write('}')
                     ->write('')
@@ -920,7 +938,8 @@ class Table extends BaseTable
 
                 $related = $this->getRelatedName($foreign);
                 $related_text = $this->getRelatedName($foreign, false);
-                $nameSingular = $this->getNaming($this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related), Formatter::NAMING_PASCAL_CASE);
+                $nameSingular = $this->getNaming($this->getRelatedVarName($foreign->getReferencedTable()->getModelName(), $related, false, $foreign));
+                $variableNameSingular = $nameSingular;
 
                 $nullable = true;
                 foreach ($foreign->getLocals() as $lc) {
@@ -942,14 +961,14 @@ class Table extends BaseTable
                     ->write('/**')
                     ->write(' * Set '.trim($foreign->getReferencedTable()->getModelName().' entity '.$related_text).' (many to one).')
                     ->write(' *')
-                    ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$this->getNaming($foreign->getReferencedTable()->getName()))
+                    ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$variableNameSingular)
                     ->write(' *')
                     ->write(' * @return '.$typehints['set_phpdoc_return'])
                     ->write(' */')
-                    ->write('public function set'.$nameSingular.'('.$typehints['set_arg'].'$'.$this->getNaming($foreign->getReferencedTable()->getName()).')'.$typehints['set_return'])
+                    ->write('public function set'.ucfirst($nameSingular).'('.$typehints['set_arg'].'$'.$variableNameSingular.')'.$typehints['set_return'])
                     ->write('{')
                     ->indent()
-                        ->write('$this->'.$this->getNaming($this->getRelatedVarName($foreign->getReferencedTable()->getName(), $related)).' = $'.$this->getNaming($foreign->getReferencedTable()->getModelName()).';')
+                        ->write('$this->'.$variableNameSingular.' = $'.$variableNameSingular.';')
                         ->write('')
                         ->write('return $this;')
                     ->outdent()
@@ -961,10 +980,10 @@ class Table extends BaseTable
                     ->write(' *')
                     ->write(' * @return '.$typehints['get_phpdoc'])
                     ->write(' */')
-                    ->write('public function get'.$nameSingular.'()'.$typehints['get_return'])
+                    ->write('public function get'.ucfirst($nameSingular).'()'.$typehints['get_return'])
                     ->write('{')
                     ->indent()
-                        ->write('return $this->'.$this->getNaming($this->getRelatedVarName($foreign->getReferencedTable()->getName(), $related)).';')
+                        ->write('return $this->'.$variableNameSingular.';')
                     ->outdent()
                     ->write('}')
                     ->write('')
@@ -1030,6 +1049,8 @@ class Table extends BaseTable
         foreach ($this->getTableM2MRelations() as $relation) {
             $this->getDocument()->addLog(sprintf('  Writing N <=> N relation "%s"', $relation['refTable']->getModelName()));
 
+            $fk2 = null;
+
             $isOwningSide = $this->getFormatter()->isOwningSide($relation, $fk2);
 
             $typehints = array(
@@ -1047,23 +1068,26 @@ class Table extends BaseTable
                 'get_return' => $this->returnTypehint(null, false),
             );
 
+            $variableNameSingular = $this->getNaming($this->getRelatedVarName($relation['refTable']->getModelName(), null, false, $fk2));
+            $variableNamePlural = $this->getNaming($this->getRelatedVarName($relation['refTable']->getModelName(), null, true, $fk2));
+
             $writer
                 ->write('/**')
                 ->write(' * Add '.$relation['refTable']->getModelName().' entity to collection.')
                 ->write(' *')
-                ->write(' * @param '.$typehints['add_phpdoc_arg'].' $'.$this->getNaming($relation['refTable']->getName()))
+                ->write(' * @param '.$typehints['add_phpdoc_arg'].' $'.$variableNameSingular)
                 ->write(' *')
                 ->write(' * @return '.$typehints['add_phpdoc_return'])
                 ->write(' */')
-                ->write('public function add'.$relation['refTable']->getModelName().'('.$typehints['add_arg'].'$'.$this->getNaming($relation['refTable']->getName()).')'.$typehints['add_return'])
+                ->write('public function add'.ucfirst($variableNameSingular).'('.$typehints['add_arg'].'$'.$variableNameSingular.')'.$typehints['add_return'])
                 ->write('{')
                 ->indent()
-                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation) {
+                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation, $variableNameSingular, $fk2) {
                         if ($isOwningSide) {
-                            $writer->write('$%s->add%s($this);', $_this->getNaming($relation['refTable']->getName()), $_this->getModelName());
+                            $writer->write('$%s->add%s($this);', $variableNameSingular, ucfirst($this->getNaming($this->getRelatedVarName($_this->getModelName(), null, false, $fk2))));
                         }
                     })
-                    ->write('$this->'.$this->getNaming($relation['refTable']->getPluralName()).'[] = $'.$this->getNaming($relation['refTable']->getName()).';')
+                    ->write('$this->'.$variableNamePlural.'[] = $'.$variableNameSingular.';')
                     ->write('')
                     ->write('return $this;')
                 ->outdent()
@@ -1072,19 +1096,19 @@ class Table extends BaseTable
                 ->write('/**')
                 ->write(' * Remove '.$relation['refTable']->getModelName().' entity from collection.')
                 ->write(' *')
-                ->write(' * @param '.$typehints['remove_phpdoc_arg'].' $'.$this->getNaming($relation['refTable']->getName()))
+                ->write(' * @param '.$typehints['remove_phpdoc_arg'].' $'.$variableNameSingular)
                 ->write(' *')
                 ->write(' * @return '.$typehints['remove_phpdoc_return'])
                 ->write(' */')
-                ->write('public function remove'.$relation['refTable']->getModelName().'('.$typehints['remove_arg'].'$'.$this->getNaming($relation['refTable']->getName()).')'.$typehints['remove_return'])
+                ->write('public function remove'.ucfirst($variableNameSingular).'('.$typehints['remove_arg'].'$'.$variableNameSingular.')'.$typehints['remove_return'])
                 ->write('{')
                 ->indent()
-                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation) {
+                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation, $variableNameSingular, $fk2) {
                         if ($isOwningSide) {
-                            $writer->write('$%s->remove%s($this);', $_this->getNaming($relation['refTable']->getName()), $_this->getModelName());
+                            $writer->write('$%s->remove%s($this);', $variableNameSingular, ucfirst($this->getNaming($this->getRelatedVarName($_this->getModelName(), null, false, $fk2))));
                         }
                     })
-                    ->write('$this->'.$this->getNaming($relation['refTable']->getPluralName()).'->removeElement($'.$this->getNaming($relation['refTable']->getModelName()).');')
+                    ->write('$this->'.$variableNamePlural.'->removeElement($'.$variableNameSingular.');')
                     ->write('')
                     ->write('return $this;')
                 ->outdent()
@@ -1095,10 +1119,10 @@ class Table extends BaseTable
                 ->write(' *')
                 ->write(' * @return '.$typehints['get_phpdoc'])
                 ->write(' */')
-                ->write('public function get'.$relation['refTable']->getPluralModelName().'()'.$typehints['get_return'])
+                ->write('public function get'.ucfirst($variableNamePlural).'()'.$typehints['get_return'])
                 ->write('{')
                 ->indent()
-                    ->write('return $this->'.$this->getNaming($relation['refTable']->getPluralName()).';')
+                    ->write('return $this->'.$variableNamePlural.';')
                 ->outdent()
                 ->write('}')
                 ->write('')
