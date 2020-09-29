@@ -38,7 +38,7 @@ class Column extends BaseColumn
     {
         $name = parent::getColumnName();
 
-        return $raw ? $name : $this->getTable()->getNaming($name);
+        return $raw ? $name : $this->getNaming($name);
     }
 
     private function getStringDefaultValue() {
