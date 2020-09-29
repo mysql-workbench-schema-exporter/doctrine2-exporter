@@ -1170,28 +1170,4 @@ class Table extends BaseTable
             return ': '.$this->typehint($type, $nullable);
         }
     }
-
-    /**
-     * Get name using naming strategy.
-     *
-     * @param string $name
-     * @param string $strategy
-     * @return string
-     */
-    public function getNaming($name, $strategy = null)
-    {
-        $strategy = $strategy ?: $this->getConfig()->get(Formatter::CFG_NAMING_STRATEGY);
-        switch ($strategy) {
-            case Formatter::NAMING_AS_IS:
-                break;
-            case Formatter::NAMING_CAMEL_CASE:
-                $name = lcfirst($this->beautify($name));
-                break;
-            case Formatter::NAMING_PASCAL_CASE:
-                $name = $this->beautify($name);
-                break;
-        }
-
-        return $name;
-    }
 }
