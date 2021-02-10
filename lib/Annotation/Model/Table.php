@@ -1208,6 +1208,9 @@ class Table extends BaseTable
         switch ($strategy) {
             case Formatter::NAMING_AS_IS:
                 break;
+            case Formatter::NAMING_AS_IS_LCFIRST:
+                $name = lcfirst($name);
+                break;
             case Formatter::NAMING_CAMEL_CASE:
                 $name = lcfirst($this->beautify($name));
                 break;

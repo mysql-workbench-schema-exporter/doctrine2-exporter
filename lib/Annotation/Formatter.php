@@ -48,6 +48,7 @@ class Formatter extends BaseFormatter
     const CFG_USE_BEHAVIORAL_EXTENSIONS             = 'useBehavioralExtensions';
 
     const NAMING_AS_IS                              = 'as-is';
+    const NAMING_AS_IS_LCFIRST                      = 'as-is-lcfirst';
     const NAMING_CAMEL_CASE                         = 'camel-case';
     const NAMING_PASCAL_CASE                        = 'pascal-case';
 
@@ -78,6 +79,7 @@ class Formatter extends BaseFormatter
         $this->addValidators(array(
             static::CFG_NAMING_STRATEGY                     => new ChoiceValidator(array(
                 static::NAMING_AS_IS,
+                static::NAMING_AS_IS_LCFIRST,
                 static::NAMING_CAMEL_CASE,
                 static::NAMING_PASCAL_CASE,
             )),
