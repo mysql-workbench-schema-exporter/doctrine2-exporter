@@ -329,8 +329,8 @@ class Table extends BaseTable
                 ->write('')
                 ->write('use %s\\%s;', $namespace, $this->getClassName(true, 'Base\\'))
                 ->write('')
-                ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
-                    $_this->writeExtendedUsedClasses($writer);
+                ->writeCallback(function(WriterInterface $writer, Table $_this = null, $hasBaseClass = true) {
+                    $_this->writeExtendedUsedClasses($writer, $hasBaseClass);
                 })
                 ->write('/**')
                 ->write(' * '.$this->getNamespace(null, false))
@@ -469,13 +469,15 @@ class Table extends BaseTable
         return $this;
     }
 
-    public function writeExtendedUsedClasses(WriterInterface $writer)
+    public function writeExtendedUsedClasses(WriterInterface $writer, $hasBaseClass = false)
     {
         $uses = array();
         if ($orm = $this->getOrmUse()) {
             $uses[] = $orm;
         }
-        $uses[] = sprintf('%s\%s', $this->getEntityNamespace(), $this->getClassName(true));
+        if (!$hasBaseClass){
+            $uses[] = sprintf('%s\%s', $this->getEntityNamespace(), $this->getClassName(true));
+        }
         $this->writeUses($writer, $uses);
 
         return $this;
