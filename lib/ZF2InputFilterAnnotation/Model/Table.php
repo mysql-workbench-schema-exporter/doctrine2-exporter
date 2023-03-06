@@ -41,12 +41,12 @@ class Table extends BaseTable
 
     protected function getUsedClasses()
     {
-        $uses = array(
+        $uses = [
             'Zend\InputFilter\InputFilter',
             'Zend\InputFilter\Factory as InputFactory',
             'Zend\InputFilter\InputFilterAwareInterface',
             'Zend\InputFilter\InputFilterInterface',
-        );
+        ];
 
         return array_merge(parent::getUsedClasses(), $uses);
     }
@@ -116,13 +116,13 @@ class Table extends BaseTable
                 ->outdent()
                 ->write('}')
                 ->write('$factory = new InputFactory();')
-                ->write('$filters = array(')
+                ->write('$filters = [')
                 ->indent()
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
                         $_this->writeInputFilterColumns($writer);
                     })
                 ->outdent()
-                ->write(');')
+                ->write('];')
                 ->write('$this->inputFilter = $factory->createInputFilter($filters);')
                 ->write('')
                 ->write('return $this->inputFilter;')
@@ -140,34 +140,34 @@ class Table extends BaseTable
             // by type
             switch ($this->getFormatter()->getDatatypeConverter()->getDataType($column->getColumnType())) {
                 case 'string':
-                    $s_filters = 'array(
-                    array(\'name\' => \'Zend\Filter\StripTags\'),
-                    array(\'name\' => \'Zend\Filter\StringTrim\'),
-                )';
-                    $s_validators = sprintf('array(
-                    array(
+                    $s_filters = '[
+                    [\'name\' => \'Zend\Filter\StripTags\'],
+                    [\'name\' => \'Zend\Filter\StringTrim\'],
+                ]';
+                    $s_validators = sprintf('[
+                    [
                         \'name\' => \'Zend\Validator\StringLength\',
-                        \'options\' => array(
+                        \'options\' => [
                             \'encoding\' => \'UTF-8\',
                             \'min\' => %s,
                             \'max\' => ' . $column->getLength() . '
-                        ),
-                    ),
-                )', $column->isNotNull()?'1':'0');
+                        ],
+                    ],
+                ]', $column->isNotNull()?'1':'0');
                     break;
                 case 'smallint':
                 case 'integer':
-                    $s_filters = 'array(
-                    array(\'name\' => \'Zend\Filter\ToInt\'),
-                )';
-                    $s_validators = 'array(
-                        array(\'name\' => \'Zend\I18n\Validator\IsInt\')
-                    )';
+                    $s_filters = '[
+                    [\'name\' => \'Zend\Filter\ToInt\'],
+                ]';
+                    $s_validators = '[
+                    [\'name\' => \'Zend\I18n\Validator\IsInt\'],
+                ]';
                     break;
                 case 'boolean':
-                    $s_filters = 'array(
-                    array(\'name\' => \'Zend\Filter\Boolean\'),
-                )';
+                    $s_filters = '[
+                    [\'name\' => \'Zend\Filter\Boolean\'],
+                ]';
                     $s_validators = '[]';
                     break;
                 case 'datetime':
@@ -175,35 +175,35 @@ class Table extends BaseTable
                     $s_validators = '[]';
                     break;
                 case 'float':
-                    $s_filters = 'array(
-                    array(\'name\' => \'Zend\I18n\Filter\NumberFormat\')
-                )';
-                    $s_validators = 'array(
-                            array(\'name\' => \'Zend\I18n\Validator\IsFloat\')
-                        )';
+                    $s_filters = '[
+                    [\'name\' => \'Zend\I18n\Filter\NumberFormat\'],
+                ]';
+                    $s_validators = '[
+                    [\'name\' => \'Zend\I18n\Validator\IsFloat\'],
+                ]';
                     break;
                 case 'decimal':
-                    $s_filters = 'array(
-                    array(\'name\' => \'Zend\Filter\Digits\')
-                )';
-                    $s_validators = 'array(
-                            array(\'name\' => \'Zend\Validator\Digits\')
-                        )';
+                    $s_filters = '[
+                    [\'name\' => \'Zend\Filter\Digits\'],
+                ]';
+                    $s_validators = '[
+                    [\'name\' => \'Zend\Validator\Digits\'],
+                ]';
                     break;
                 case 'text':
-                    $s_filters = 'array(
-                )';
+                    $s_filters = '[
+                ]';
                     if ($column->getLength() > 0) {
-                        $s_validators = sprintf('array(
-                            array(
+                        $s_validators = sprintf('[
+                            [
                                 \'name\' => \'Zend\Validator\StringLength\',
-                                \'options\' => array(
+                                \'options\' => [
                                     \'encoding\' => \'UTF-8\',
                                     \'min\' => %s,
                                     \'max\' => ' . $column->getLength() . '
-                                ),
-                            ),
-                        )', $column->isNotNull()?'1':'0');
+                                ],
+                            ],
+                        ]', $column->isNotNull() ? '1' : '0');
                     } else {
                         $s_validators = '[]';
                     }
@@ -211,33 +211,33 @@ class Table extends BaseTable
                 default:
                     $s_filters = '[]';
                     $s_validators = '[]';
-                break;
+                    break;
             }
             
             // by name
             if (strstr($column->getColumnName(), 'phone') or strstr($column->getColumnName(), '_tel')) {
-                $s_validators = 'array(
-                            array(\'name\' => \'Zend\I18n\Validator\PhoneNumber\')
-                        )';
-            } elseif (strstr($column->getColumnName(), 'email')){
-                $s_validators = 'array(
-                            array(\'name\' => \'Zend\Validator\EmailAddress\')
-                        )';
-            } elseif (strstr($column->getColumnName(), 'postcode') or strstr($column->getColumnName(), '_zip')){
-                $s_validators = 'array(
-                            array(\'name\' => \'Zend\I18n\Validator\PostCode\')
-                        )';
+                $s_validators = '[
+                            [\'name\' => \'Zend\I18n\Validator\PhoneNumber\'],
+                        ]';
+            } elseif (strstr($column->getColumnName(), 'email')) {
+                $s_validators = '[
+                            [\'name\' => \'Zend\Validator\EmailAddress\'],
+                        ]';
+            } elseif (strstr($column->getColumnName(), 'postcode') or strstr($column->getColumnName(), '_zip')) {
+                $s_validators = '[
+                            [\'name\' => \'Zend\I18n\Validator\PostCode\'],
+                        ]';
             }
             
             $writer
-                ->write('array(')
+                ->write('[')
                 ->indent()
                     ->write('\'name\' => \'%s\',', $column->getColumnName())
                     ->write('\'required\' => %s,', $column->isNotNull() && !$column->isPrimary() ? 'true' : 'false')
                     ->write('\'filters\' => %s,', $s_filters)
                     ->write('\'validators\' => %s,', $s_validators)
                 ->outdent()
-                ->write('),')
+                ->write('],')
             ;
         }
         return $this;
@@ -310,10 +310,10 @@ class Table extends BaseTable
             ->write('public function getArrayCopy(array $fields = [])')
             ->write('{')
             ->indent()
-                ->write('$dataFields = array(%s);', implode(', ', array_map(function($column) {
+                ->write('$dataFields = [%s];', implode(', ', array_map(function($column) {
                     return sprintf('\'%s\'', $column);
                 }, $columns->getColumnNames())))
-                ->write('$relationFields = array(%s);', implode(', ', array_map(function($relation) {
+                ->write('$relationFields = [%s];', implode(', ', array_map(function($relation) {
                     return sprintf('\'%s\'', lcfirst($relation->getReferencedTable()->getModelName()));
                 }, $relations)))
                 ->write('$copiedFields = [];')
@@ -339,7 +339,7 @@ class Table extends BaseTable
                         ->write('? $relationEntity->getArrayCopy($map)')
                         ->write(': $relationEntity->getArrayCopy();')
                     ->outdent()
-                    ->write('$fields = array_diff($fields, array($relationField));')
+                    ->write('$fields = array_diff($fields, [$relationField]);')
                 ->outdent()
                 ->write('}')
                 ->write('foreach ($dataFields as $dataField) {')
