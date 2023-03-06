@@ -76,7 +76,7 @@ class Column extends BaseColumn
                         ' * @Gedmo\Timestampable(on="update")')
                 ->write(' * '.$this->getTable()->getAnnotation('Column', $this->asAnnotation()))
                 ->writeIf($this->isAutoIncrement(),
-                        ' * '.$this->getTable()->getAnnotation('GeneratedValue', array('strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY)))))
+                        ' * '.$this->getTable()->getAnnotation('GeneratedValue', ['strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY))]))
                 ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'path'),
                         ' * @Gedmo\UploadableFilePath')
                 ->writeIf($isBehavioralColumn && strstr($this->getColumnName(), 'name'),
@@ -104,7 +104,7 @@ class Column extends BaseColumn
             $nativeType = $converter->getNativeType($converter->getMappedType($this));
             $columnName = $this->getColumnName(false);
 
-            $typehints = array(
+            $typehints = [
                 'set_phpdoc_arg' => $this->typehint($nativeType, !$this->isNotNull()),
                 'set_phpdoc_return' => $this->typehint($table->getNamespace(), false),
                 'set_arg' => $this->paramTypehint($nativeType, !$this->isNotNull()),
@@ -112,7 +112,7 @@ class Column extends BaseColumn
 
                 'get_phpdoc' => $this->typehint($nativeType, !$this->isNotNull()),
                 'get_return' => $this->returnTypehint($nativeType, null === $this->getDefaultValue() ? true : !$this->isNotNull()),
-            );
+            ];
 
             $writer
                 // setter
@@ -157,10 +157,10 @@ class Column extends BaseColumn
     public function asAnnotation()
     {
         $columnName = $this->getColumnName(false);
-        $attributes = array(
+        $attributes = [
             'name' => ($quotedColumnName = $this->getTable()->quoteIdentifier($this->getColumnName())) !== $columnName ? $quotedColumnName : null,
             'type' => $this->getFormatter()->getDatatypeConverter()->getMappedType($this),
-        );
+        ];
         if (($length = $this->parameters->get('length')) && ($length != -1)) {
             $attributes['length'] = (int) $length;
         }
@@ -172,9 +172,9 @@ class Column extends BaseColumn
             $attributes['nullable'] = $this->getNullableValue();
         }
 
-        $attributes['options'] = array();
+        $attributes['options'] = [];
         if ($this->isUnsigned()) {
-            $attributes['options'] = array('unsigned' => true);
+            $attributes['options'] = ['unsigned' => true];
         }
 
         if ('json' === $attributes['type']) {
@@ -196,7 +196,7 @@ class Column extends BaseColumn
     protected function typehint($type, $nullable)
     {
         if (strlen($type)) {
-            $type = strtr($type, array('integer' => 'int', 'boolean' => 'bool'));
+            $type = strtr($type, ['integer' => 'int', 'boolean' => 'bool']);
             if ($this->getConfig()->get(Formatter::CFG_PHP7_TYPEHINTS)) {
                 if ($nullable || '\DateTime' === $type) {
                     $type = '?'.$type;

@@ -63,7 +63,7 @@ abstract class Formatter extends BaseFormatter
     protected function init()
     {
         parent::init();
-        $this->addConfigurations(array(
+        $this->addConfigurations([
             static::CFG_BUNDLE_NAMESPACE              => '',
             static::CFG_PREFIX_TABLENAME              => '',
             static::CFG_ENTITY_NAMESPACE              => '',
@@ -74,17 +74,17 @@ abstract class Formatter extends BaseFormatter
             static::CFG_NULLABLE_ATTRIBUTE            => static::NULLABLE_AUTO,
             static::CFG_GENERATED_VALUE_STRATEGY      => static::GENERATED_VALUE_AUTO,
             static::CFG_DEFAULT_CASCADE               => false,
-        ));
-        $this->addValidators(array(
-            static::CFG_NULLABLE_ATTRIBUTE            => new ChoiceValidator(array(static::NULLABLE_AUTO, static::NULLABLE_ALWAYS)),
-            static::CFG_GENERATED_VALUE_STRATEGY      => new ChoiceValidator(array(
+        ]);
+        $this->addValidators([
+            static::CFG_NULLABLE_ATTRIBUTE            => new ChoiceValidator([static::NULLABLE_AUTO, static::NULLABLE_ALWAYS]),
+            static::CFG_GENERATED_VALUE_STRATEGY      => new ChoiceValidator([
                 static::GENERATED_VALUE_AUTO,
                 static::GENERATED_VALUE_IDENTITY,
                 static::GENERATED_VALUE_SEQUENCE,
                 static::GENERATED_VALUE_TABLE,
                 static::GENERATED_VALUE_NONE,
-            )),
-            static::CFG_DEFAULT_CASCADE               => new ChoiceValidator(array(
+            ]),
+            static::CFG_DEFAULT_CASCADE               => new ChoiceValidator([
                 static::CASCADE_OPTION_PERSIST,
                 static::CASCADE_OPTION_REMOVE,
                 static::CASCADE_OPTION_DETACH,
@@ -92,13 +92,13 @@ abstract class Formatter extends BaseFormatter
                 static::CASCADE_OPTION_ALL,
                 static::CASCADE_OPTION_REFRESH,
                 false
-            )),
-        ));
+            ]),
+        ]);
     }
 
     public function getVersion()
     {
-        return '3.1.3';
+        return '3.2.0';
     }
 
     /**
@@ -149,7 +149,7 @@ abstract class Formatter extends BaseFormatter
         /** @var Validator $validator */
         $validator = $this->getRegistry()->validator->get(static::CFG_DEFAULT_CASCADE);
 
-        $cascadeValue = array_map('strtolower', array_map('trim', explode(',', $cascadeValue)));
+        $cascadeValue = array_map('strtolower', array_map('trim', explode(',', (string) $cascadeValue)));
         $cascadeValue = array_intersect($cascadeValue, $validator->getChoices());
         $cascadeValue = array_filter($cascadeValue);
         if (empty($cascadeValue)) {
@@ -183,8 +183,8 @@ abstract class Formatter extends BaseFormatter
      */
     public function getOrderOption($sortValue)
     {
-        $orders = array();
-        if ($sortValue = trim($sortValue)) {
+        $orders = [];
+        if ($sortValue = trim((string) $sortValue)) {
             $lines = array_map('trim', explode("\n", $sortValue));
             foreach ($lines as $line) {
                 if (count($values = array_map('trim', explode(',', $line)))) {

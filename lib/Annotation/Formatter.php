@@ -53,7 +53,7 @@ class Formatter extends BaseFormatter
     protected function init()
     {
         parent::init();
-        $this->addConfigurations(array(
+        $this->addConfigurations([
             static::CFG_INDENTATION                         => 4,
             static::CFG_FILENAME                            => '%entity%.%extension%',
             static::CFG_ANNOTATION_PREFIX                   => 'ORM\\',
@@ -67,20 +67,20 @@ class Formatter extends BaseFormatter
             static::CFG_PHP7_TYPEHINTS                      => false,
             static::CFG_PHP7_ARG_TYPEHINTS                  => true,
             static::CFG_PHP7_RETURN_TYPEHINTS               => true,
-            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS      => array(),
-        ));
-        $this->addValidators(array(
-            static::CFG_QUOTE_IDENTIFIER_STRATEGY           => new ChoiceValidator(array(
+            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS      => [],
+        ]);
+        $this->addValidators([
+            static::CFG_QUOTE_IDENTIFIER_STRATEGY           => new ChoiceValidator([
                 static::QUOTE_IDENTIFIER_AUTO,
                 static::QUOTE_IDENTIFIER_ALWAYS,
                 static::QUOTE_IDENTIFIER_NONE,
-            )),
-        ));
-        $this->addDependency(array(
+            ]),
+        ]);
+        $this->addDependency([
             static::CFG_PHP7_ARG_TYPEHINTS,
             static::CFG_PHP7_RETURN_TYPEHINTS,
             static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS,
-        ), static::CFG_PHP7_TYPEHINTS, true);
+        ], static::CFG_PHP7_TYPEHINTS, true);
     }
 
     /**

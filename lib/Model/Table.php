@@ -62,8 +62,10 @@ class Table extends BaseTable
      */
     public function getEntityCacheMode()
     {
-        $cacheMode = strtoupper(trim($this->parseComment('cache')));
-        if (in_array($cacheMode, array('READ_ONLY', 'NONSTRICT_READ_WRITE', 'READ_WRITE'))) return $cacheMode;
+        $cacheMode = strtoupper(trim((string) $this->parseComment('cache')));
+        if (in_array($cacheMode, ['READ_ONLY', 'NONSTRICT_READ_WRITE', 'READ_WRITE'])) {
+            return $cacheMode;
+        }
     }
 
     /**
@@ -104,16 +106,16 @@ class Table extends BaseTable
      */
     public function getLifecycleCallbacks()
     {
-        $result = array();
-        if ($lifecycleCallbacks = trim($this->parseComment('lifecycleCallbacks'))) {
+        $result = [];
+        if ($lifecycleCallbacks = trim((string) $this->parseComment('lifecycleCallbacks'))) {
             foreach (explode("\n", $lifecycleCallbacks) as $callback) {
                 list($method, $handler) = explode(':', $callback, 2);
                 $method = lcfirst(trim($method));
-                if (!in_array($method, array('postLoad', 'prePersist', 'postPersist', 'preRemove', 'postRemove', 'preUpdate', 'postUpdate'))) {
+                if (!in_array($method, ['postLoad', 'prePersist', 'postPersist', 'preRemove', 'postRemove', 'preUpdate', 'postUpdate'])) {
                     continue;
                 }
                 if (!isset($result[$method])) {
-                    $result[$method] = array();
+                    $result[$method] = [];
                 }
                 $result[$method][] = trim($handler);
             }
@@ -138,7 +140,7 @@ class Table extends BaseTable
          */
 
         $nameFromCommentTag = '';
-        $relatedNames = trim($this->parseComment('relatedNames'));
+        $relatedNames = trim((string) $this->parseComment('relatedNames'));
 
         if ('' !== $relatedNames) {
             foreach (explode("\n", $relatedNames) as $relationMap) {
@@ -152,7 +154,7 @@ class Table extends BaseTable
         if ($nameFromCommentTag) {
             $name = $nameFromCommentTag;
         } else {
-            $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), array('%name%' => $name, '%related%' => $related)) : $name;
+            $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), ['%name%' => $name, '%related%' => $related]) : $name;
         }
 
         return $plural ? $this->pluralize($name) : $name;

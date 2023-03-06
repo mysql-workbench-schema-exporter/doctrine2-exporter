@@ -35,7 +35,7 @@ class Column extends BaseColumn
 {
     public function asYAML()
     {
-        $values = array();
+        $values = [];
         $values['type'] = $this->getFormatter()->getDatatypeConverter()->getMappedType($this);
         if (($length = $this->getParameters()->get('length')) && ($length != -1)) {
             $values['length'] = (int) $length;
@@ -51,7 +51,7 @@ class Column extends BaseColumn
             $values['unsigned'] = true;
         }
         if ($this->isAutoIncrement()) {
-            $values['generator'] = array('strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY)));
+            $values['generator'] = ['strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY))];
         }
         if ($this->getDefaultValue() !== null) {
             $values['options']['default'] = $this->isStringType()

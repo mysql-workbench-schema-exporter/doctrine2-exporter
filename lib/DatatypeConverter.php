@@ -34,7 +34,7 @@ class DatatypeConverter extends BaseDatatypeConverter
 {
     public function setup()
     {
-        $this->register(array(
+        $this->register([
             static::DATATYPE_TINYINT            => 'smallint',
             static::DATATYPE_SMALLINT           => 'smallint',
             static::DATATYPE_MEDIUMINT          => 'integer',
@@ -95,7 +95,7 @@ class DatatypeConverter extends BaseDatatypeConverter
             static::USERDATATYPE_NUMERIC        => 'decimal',
             static::USERDATATYPE_DEC            => 'decimal',
             static::USERDATATYPE_CHARACTER      => 'string',
-        ));
+        ]);
     }
 
     public function getNativeType($type)

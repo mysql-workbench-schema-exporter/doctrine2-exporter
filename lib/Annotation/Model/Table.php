@@ -113,7 +113,7 @@ class Table extends BaseTable
      * @param array  $options     The annotation options
      * @return \MwbExporter\Object\Annotation
      */
-    public function getAnnotation($annotation, $content = null, $options = array())
+    public function getAnnotation($annotation, $content = null, $options = [])
     {
         return new Annotation($this->addPrefix($annotation), $content, $options);
     }
@@ -126,16 +126,16 @@ class Table extends BaseTable
      */
     protected function getIndexesAnnotation($type = 'Index')
     {
-        $indices = array();
+        $indices = [];
         foreach ($this->getTableIndices() as $index) {
             switch (true) {
                 case $type === 'Index' && $index->isIndex():
                 case $type === 'UniqueConstraint' && $index->isUnique():
-                    $columns = array();
+                    $columns = [];
                     foreach ($index->getColumns() as $column) {
                         $columns[] = $this->quoteIdentifier($column->getColumnName());
                     }
-                    $indices[] = $this->getAnnotation($type, array('name' => $index->getName(), 'columns' => $columns));
+                    $indices[] = $this->getAnnotation($type, ['name' => $index->getName(), 'columns' => $columns]);
                     break;
 
                 default:
@@ -157,7 +157,7 @@ class Table extends BaseTable
      */
     public function getJoinAnnotation($joinType, $entity, $mappedBy = null, $inversedBy = null)
     {
-        return $this->getAnnotation($joinType, array('targetEntity' => $entity, 'mappedBy' => $mappedBy, 'inversedBy' => $inversedBy));
+        return $this->getAnnotation($joinType, ['targetEntity' => $entity, 'mappedBy' => $mappedBy, 'inversedBy' => $inversedBy]);
     }
 
     /**
@@ -170,20 +170,20 @@ class Table extends BaseTable
      */
     protected function getJoins(ForeignKey $fkey, $owningSide = true)
     {
-        $joins = array();
+        $joins = [];
         $lcols = $owningSide ? $fkey->getForeigns() : $fkey->getLocals();
         $fcols = $owningSide ? $fkey->getLocals() : $fkey->getForeigns();
         $onDelete = $this->getFormatter()->getDeleteRule($fkey->getParameters()->get('deleteRule'));
         for ($i = 0; $i < count($lcols); $i++) {
-            $joins[] = $this->getAnnotation('JoinColumn', array(
+            $joins[] = $this->getAnnotation('JoinColumn', [
                 'name'                  => $this->quoteIdentifier($lcols[$i]->getColumnName()),
                 'referencedColumnName'  => $this->quoteIdentifier($fcols[$i]->getColumnName()),
                 'nullable'              => $lcols[$i]->getNullableValue(true),
                 'onDelete'              => $onDelete,
-            ));
+            ]);
         }
 
-        return count($joins) > 1 ? $this->getAnnotation('JoinColumns', array($joins), array('multiline' => true, 'wrapper' => ' * %s')) : $joins[0];
+        return count($joins) > 1 ? $this->getAnnotation('JoinColumns', [$joins], ['multiline' => true, 'wrapper' => ' * %s']) : $joins[0];
     }
 
     public function writeTable(WriterInterface $writer)
@@ -264,15 +264,15 @@ class Table extends BaseTable
             ->writeIf($hasDeletableBehaviour,
                     ' * @Gedmo\SoftDeleteable(fieldName="deleted_at", timeAware=false, hardDelete=false)')
             ->writeIf(!$extendableEntity,
-                    ' * '.$this->getAnnotation('Entity', array('repositoryClass' => $this->getConfig()->get(Formatter::CFG_AUTOMATIC_REPOSITORY) ? $repositoryNamespace.$this->getModelName().'Repository' : null)))
-            ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
-            ->write(' * '.$this->getAnnotation('Table', array('name' => $this->quoteIdentifier($this->getRawTableName()), 'indexes' => $this->getIndexesAnnotation('Index'), 'uniqueConstraints' => $this->getIndexesAnnotation('UniqueConstraint'))))
+                    ' * '.$this->getAnnotation('Entity', ['repositoryClass' => $this->getConfig()->get(Formatter::CFG_AUTOMATIC_REPOSITORY) ? $repositoryNamespace.$this->getModelName().'Repository' : null]))
+            ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', [$cacheMode]))
+            ->write(' * '.$this->getAnnotation('Table', ['name' => $this->quoteIdentifier($this->getRawTableName()), 'indexes' => $this->getIndexesAnnotation('Index'), 'uniqueConstraints' => $this->getIndexesAnnotation('UniqueConstraint')]))
             ->writeIf($extendableEntityHasDiscriminator,
-                    ' * '.$this->getAnnotation('InheritanceType', array('SINGLE_TABLE')))
+                    ' * '.$this->getAnnotation('InheritanceType', ['SINGLE_TABLE']))
             ->writeIf($extendableEntityHasDiscriminator,
                     ' * '.$this->getAnnotation('DiscriminatorColumn', $this->getInheritanceDiscriminatorColumn()))
             ->writeIf($extendableEntityHasDiscriminator,
-                    ' * '.$this->getAnnotation('DiscriminatorMap', array($this->getInheritanceDiscriminatorMap())))
+                    ' * '.$this->getAnnotation('DiscriminatorMap', [$this->getInheritanceDiscriminatorMap()]))
             ->writeIf($lifecycleCallbacks, ' * '.$this->addPrefix('HasLifecycleCallbacks'))
             ->writeIf($useBehavioralExtensions && strstr($this->getClassName($extendableEntity), 'Img'),
                     ' * @Gedmo\Uploadable(path="./public/upload/' . $this->getClassName($extendableEntity) . '", filenameGenerator="SHA1", allowOverwrite=true, appendNumber=true)')
@@ -336,8 +336,8 @@ class Table extends BaseTable
                 ->write(' * '.$this->getNamespace(null, false))
                 ->write(' *')
                 ->writeIf($comment, $comment)
-                ->write(' * '.$this->getAnnotation('Entity', array('repositoryClass' => $this->getConfig()->get(Formatter::CFG_AUTOMATIC_REPOSITORY) ? $repositoryNamespace.$this->getModelName().'Repository' : null)))
-                ->write(' * '.$this->getAnnotation('Table', array('name' => $this->quoteIdentifier($this->getRawTableName()))))
+                ->write(' * '.$this->getAnnotation('Entity', ['repositoryClass' => $this->getConfig()->get(Formatter::CFG_AUTOMATIC_REPOSITORY) ? $repositoryNamespace.$this->getModelName().'Repository' : null]))
+                ->write(' * '.$this->getAnnotation('Table', ['name' => $this->quoteIdentifier($this->getRawTableName())]))
                 ->write(' */')
                 ->write('class %s extends %s', $this->getClassName(), $this->getClassName(true))
                 ->write('{')
@@ -355,7 +355,7 @@ class Table extends BaseTable
      */
     protected function getClassFileName($base = false)
     {
-        return ($base ? $this->getTableFileName(null, array('%entity%' => 'Base'.DIRECTORY_SEPARATOR.'Base'.$this->getModelName())) : $this->getTableFileName());
+        return ($base ? $this->getTableFileName(null, ['%entity%' => 'Base'.DIRECTORY_SEPARATOR.'Base'.$this->getModelName()]) : $this->getTableFileName());
     }
 
     /**
@@ -427,7 +427,7 @@ class Table extends BaseTable
      */
     protected function getUsedClasses()
     {
-        $uses = array();
+        $uses = [];
         if (count($this->getTableM2MRelations()) || count($this->getAllLocalForeignKeys())) {
             $uses[] = $this->getCollectionClass();
         }
@@ -440,8 +440,8 @@ class Table extends BaseTable
 
     protected function getInheritanceDiscriminatorColumn()
     {
-        $result = array();
-        if ($column = trim($this->parseComment('discriminator'))) {
+        $result = [];
+        if ($column = trim((string) $this->parseComment('discriminator'))) {
             $result['name'] = $column;
             foreach ($this->getColumns() as $col) {
                 if ($column == $col->getColumnName()) {
@@ -459,7 +459,7 @@ class Table extends BaseTable
 
     protected function getInheritanceDiscriminatorMap()
     {
-        return array('base' => $this->getNamespace($this->getClassName(true, 'Base\\')), 'extended' => $this->getNamespace());
+        return ['base' => $this->getNamespace($this->getClassName(true, 'Base\\')), 'extended' => $this->getNamespace()];
     }
 
     public function writeUsedClasses(WriterInterface $writer)
@@ -471,7 +471,7 @@ class Table extends BaseTable
 
     public function writeExtendedUsedClasses(WriterInterface $writer)
     {
-        $uses = array();
+        $uses = [];
         if ($orm = $this->getOrmUse()) {
             $uses[] = $orm;
         }
@@ -481,7 +481,7 @@ class Table extends BaseTable
         return $this;
     }
 
-    protected function writeUses(WriterInterface $writer, $uses = array())
+    protected function writeUses(WriterInterface $writer, $uses = [])
     {
         if (count($uses)) {
             foreach ($uses as $use) {
@@ -537,26 +537,26 @@ class Table extends BaseTable
 
             $this->getDocument()->addLog(sprintf('  Writing 1 <=> ? relation "%s"', $targetEntity));
 
-            $annotationOptions = array(
+            $annotationOptions = [
                 'targetEntity' => $targetEntityFQCN,
                 'mappedBy' => $this->getNaming($local->getOwningTable()->getRelatedVarName($mappedBy, $related)),
                 'cascade' => $this->getFormatter()->getCascadeOption($local->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($local->parseComment('fetch')),
                 'orphanRemoval' => $this->getFormatter()->getBooleanOption($local->parseComment('orphanRemoval')),
-            );
+            ];
 
             if ($local->isManyToOne()) {
                 $this->getDocument()->addLog('  Relation considered as "1 <=> N"');
 
                 $writer
                     ->write('/**')
-                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', [$cacheMode]))
                     ->write(' * '.$this->getAnnotation('OneToMany', $annotationOptions))
                     ->write(' * '.$this->getJoins($local))
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($local) {
                         if (count($orders = $_this->getFormatter()->getOrderOption($local->parseComment('order')))) {
                             $writer
-                                ->write(' * '.$_this->getAnnotation('OrderBy', array($orders)))
+                                ->write(' * '.$_this->getAnnotation('OrderBy', [$orders]))
                             ;
                         }
                     })
@@ -569,7 +569,7 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
-                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', [$cacheMode]))
                     ->write(' * '.$this->getAnnotation('OneToOne', $annotationOptions))
                     ->write(' */')
                     ->write('protected $'.$this->getNaming($targetEntity).';')
@@ -592,12 +592,12 @@ class Table extends BaseTable
 
             $this->getDocument()->addLog(sprintf('  Writing N <=> ? relation "%s"', $targetEntity));
 
-            $annotationOptions = array(
+            $annotationOptions = [
                 'targetEntity' => $targetEntityFQCN,
                 'inversedBy' => $foreign->isUnidirectional() ? null : $this->getNaming($this->getRelatedVarName($inversedBy, $related, true)),
                 'cascade' => $this->getFormatter()->getCascadeOption($foreign->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($foreign->parseComment('fetch')),
-            );
+            ];
             $cacheMode = $this->getFormatter()->getCacheOption($foreign->parseComment('cache'));
 
             if ($foreign->isManyToOne()) {
@@ -605,7 +605,7 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
-                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', [$cacheMode]))
                     ->write(' * '.$this->getAnnotation('ManyToOne', $annotationOptions))
                     ->write(' * '.$this->getJoins($foreign, false))
                     ->write(' */')
@@ -622,7 +622,7 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
-                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', [$cacheMode]))
                     ->write(' * '.$this->getAnnotation('OneToOne', $annotationOptions))
                     ->write(' * '.$this->getJoins($foreign, false))
                     ->write(' */')
@@ -642,13 +642,13 @@ class Table extends BaseTable
 
             $fk1 = $relation['reference'];
             $isOwningSide = $this->getFormatter()->isOwningSide($relation, $fk2);
-            $annotationOptions = array(
+            $annotationOptions = [
                 'targetEntity' => $relation['refTable']->getModelNameAsFQCN(),
                 'mappedBy' => null,
                 'inversedBy' => $this->getNaming($this->getPluralName()),
                 'cascade' => $this->getFormatter()->getCascadeOption($fk1->parseComment('cascade')),
                 'fetch' => $this->getFormatter()->getFetchOption($fk1->parseComment('fetch')),
-            );
+            ];
             $cacheMode = $this->getFormatter()->getCacheOption($fk1->parseComment('cache'));
 
             // if this is the owning side, also output the JoinTable Annotation
@@ -662,18 +662,18 @@ class Table extends BaseTable
 
                 $writer
                     ->write('/**')
-                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', [$cacheMode]))
                     ->write(' * '.$this->getAnnotation('ManyToMany', $annotationOptions))
                     ->write(' * '.$this->getAnnotation('JoinTable',
-                        array(
+                        [
                             'name'               => $this->quoteIdentifier($relation['reference']->getOwningTable()->getRawTableName()),
-                            'joinColumns'        => array($this->getJoins($fk1, false)),
-                            'inverseJoinColumns' => array($this->getJoins($fk2, false)),
-                        ), array('multiline' => true, 'wrapper' => ' * %s')))
+                            'joinColumns'        => [$this->getJoins($fk1, false)],
+                            'inverseJoinColumns' => [$this->getJoins($fk2, false)],
+                        ], ['multiline' => true, 'wrapper' => ' * %s']))
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($fk2) {
                         if (count($orders = $_this->getFormatter()->getOrderOption($fk2->parseComment('order')))) {
                             $writer
-                                ->write(' * '.$_this->getAnnotation('OrderBy', array($orders)))
+                                ->write(' * '.$_this->getAnnotation('OrderBy', [$orders]))
                             ;
                         }
                     })
@@ -690,7 +690,7 @@ class Table extends BaseTable
                 $annotationOptions['inversedBy'] = null;
                 $writer
                     ->write('/**')
-                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', array($cacheMode)))
+                    ->writeIf($cacheMode, ' * '.$this->getAnnotation('Cache', [$cacheMode]))
                     ->write(' * '.$this->getAnnotation('ManyToMany', $annotationOptions))
                     ->write(' */')
                 ;
@@ -788,7 +788,7 @@ class Table extends BaseTable
                 $nameSingular = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related), Formatter::NAMING_PASCAL_CASE);
                 $namePlural = $this->getNaming($this->getRelatedVarName($local->getOwningTable()->getModelName(), $related, true), Formatter::NAMING_PASCAL_CASE);
 
-                $typehints = array(
+                $typehints = [
                     'add_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), false),
                     'add_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'add_arg' => $this->paramTypehint($local->getOwningTable()->getNamespace(), false),
@@ -801,7 +801,7 @@ class Table extends BaseTable
 
                     'get_phpdoc' => $this->typehint($this->getCollectionInterface(), false),
                     'get_return' => $this->returnTypehint(null, false),
-                );
+                ];
 
                 $writer
                     // setter
@@ -861,7 +861,7 @@ class Table extends BaseTable
                     $nullable = $nullable && $lc->isNotNull();
                 }
 
-                $typehints = array(
+                $typehints = [
                     'set_phpdoc_arg' => $this->typehint($local->getOwningTable()->getNamespace(), $nullable),
                     'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'set_arg' => $this->paramTypehint($local->getOwningTable()->getNamespace(), $nullable),
@@ -869,7 +869,7 @@ class Table extends BaseTable
 
                     'get_phpdoc' => $this->typehint($local->getOwningTable()->getNamespace(), $nullable),
                     'get_return' => $this->returnTypehint($local->getOwningTable()->getNamespace(), true),
-                );
+                ];
 
                 $writer
                     // setter
@@ -927,7 +927,7 @@ class Table extends BaseTable
                     $nullable = $nullable && $lc->isNotNull();
                 }
 
-                $typehints = array(
+                $typehints = [
                     'set_phpdoc_arg' => $this->typehint($foreign->getReferencedTable()->getNamespace(), true),
                     'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'set_arg' => $this->paramTypehint($foreign->getReferencedTable()->getNamespace(), true),
@@ -935,7 +935,7 @@ class Table extends BaseTable
 
                     'get_phpdoc' => $this->typehint($foreign->getReferencedTable()->getNamespace(), true),
                     'get_return' => $this->returnTypehint($foreign->getReferencedTable()->getNamespace(), true),
-                );
+                ];
 
                 $writer
                     // setter
@@ -977,7 +977,7 @@ class Table extends BaseTable
                     $nullable = $nullable && $lc->isNotNull();
                 }
 
-                $typehints = array(
+                $typehints = [
                     'set_phpdoc_arg' => $this->typehint($foreign->getReferencedTable()->getNamespace(), $nullable),
                     'set_phpdoc_return' => $this->typehint($this->getNamespace(), false),
                     'set_arg' => $this->paramTypehint($foreign->getReferencedTable()->getNamespace(), $nullable),
@@ -985,7 +985,7 @@ class Table extends BaseTable
 
                     'get_phpdoc' => $this->typehint($foreign->getReferencedTable()->getNamespace(), $nullable),
                     'get_return' => $this->returnTypehint($foreign->getReferencedTable()->getNamespace(), true),
-                );
+                ];
 
                 $writer
                     // setter
@@ -1032,7 +1032,7 @@ class Table extends BaseTable
 
             $isOwningSide = $this->getFormatter()->isOwningSide($relation, $fk2);
 
-            $typehints = array(
+            $typehints = [
                 'add_phpdoc_arg' => $this->typehint($relation['refTable']->getNamespace(), false),
                 'add_phpdoc_return' => $this->typehint($this->getNamespace($this->getModelName()), false),
                 'add_arg' => $this->paramTypehint($relation['refTable']->getNamespace(), false),
@@ -1045,7 +1045,7 @@ class Table extends BaseTable
 
                 'get_phpdoc' => $this->typehint($this->getCollectionInterface(), false),
                 'get_return' => $this->returnTypehint(null, false),
-            );
+            ];
 
             $writer
                 ->write('/**')
@@ -1121,7 +1121,7 @@ class Table extends BaseTable
 
     public function writeSerialization(WriterInterface $writer)
     {
-        $serialized = array();
+        $serialized = [];
         foreach ($this->getColumns() as $column) {
             if (!$column->isIgnored()) {
                 $serialized[] = sprintf('\'%s\'', $column->getColumnName(false));
@@ -1131,7 +1131,7 @@ class Table extends BaseTable
             ->write('public function __sleep()')
             ->write('{')
             ->indent()
-                ->write('return array(%s);', implode(', ', $serialized))
+                ->write('return [%s];', implode(', ', $serialized))
             ->outdent()
             ->write('}')
         ;
