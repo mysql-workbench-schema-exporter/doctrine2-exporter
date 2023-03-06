@@ -441,7 +441,7 @@ class Table extends BaseTable
     protected function getInheritanceDiscriminatorColumn()
     {
         $result = [];
-        if ($column = trim($this->parseComment('discriminator'))) {
+        if ($column = trim((string) $this->parseComment('discriminator'))) {
             $result['name'] = $column;
             foreach ($this->getColumns() as $col) {
                 if ($column == $col->getColumnName()) {

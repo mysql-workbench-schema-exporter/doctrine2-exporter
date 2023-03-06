@@ -149,7 +149,7 @@ abstract class Formatter extends BaseFormatter
         /** @var Validator $validator */
         $validator = $this->getRegistry()->validator->get(static::CFG_DEFAULT_CASCADE);
 
-        $cascadeValue = array_map('strtolower', array_map('trim', explode(',', $cascadeValue)));
+        $cascadeValue = array_map('strtolower', array_map('trim', explode(',', (string) $cascadeValue)));
         $cascadeValue = array_intersect($cascadeValue, $validator->getChoices());
         $cascadeValue = array_filter($cascadeValue);
         if (empty($cascadeValue)) {
@@ -184,7 +184,7 @@ abstract class Formatter extends BaseFormatter
     public function getOrderOption($sortValue)
     {
         $orders = [];
-        if ($sortValue = trim($sortValue)) {
+        if ($sortValue = trim((string) $sortValue)) {
             $lines = array_map('trim', explode("\n", $sortValue));
             foreach ($lines as $line) {
                 if (count($values = array_map('trim', explode(',', $line)))) {
