@@ -183,7 +183,7 @@ abstract class Formatter extends BaseFormatter
      */
     public function getOrderOption($sortValue)
     {
-        $orders = array();
+        $orders = [];
         if ($sortValue = trim($sortValue)) {
             $lines = array_map('trim', explode("\n", $sortValue));
             foreach ($lines as $line) {

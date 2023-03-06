@@ -172,7 +172,7 @@ class Column extends BaseColumn
             $attributes['nullable'] = $this->getNullableValue();
         }
 
-        $attributes['options'] = array();
+        $attributes['options'] = [];
         if ($this->isUnsigned()) {
             $attributes['options'] = array('unsigned' => true);
         }

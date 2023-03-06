@@ -168,11 +168,11 @@ class Table extends BaseTable
                     $s_filters = 'array(
                     array(\'name\' => \'Zend\Filter\Boolean\'),
                 )';
-                    $s_validators = 'array()';
+                    $s_validators = '[]';
                     break;
                 case 'datetime':
-                    $s_filters = 'array()';
-                    $s_validators = 'array()';
+                    $s_filters = '[]';
+                    $s_validators = '[]';
                     break;
                 case 'float':
                     $s_filters = 'array(
@@ -205,12 +205,12 @@ class Table extends BaseTable
                             ),
                         )', $column->isNotNull()?'1':'0');
                     } else {
-                        $s_validators = 'array()';
+                        $s_validators = '[]';
                     }
                     break;
                 default:
-                    $s_filters = 'array()';
-                    $s_validators = 'array()';
+                    $s_filters = '[]';
+                    $s_validators = '[]';
                 break;
             }
             
@@ -260,7 +260,7 @@ class Table extends BaseTable
             ->write(' * @param array $data')
             ->write(' * @return boolean')
             ->write(' */')
-            ->write('public function populate(array $data = array())')
+            ->write('public function populate(array $data = [])')
             ->write('{')
             ->indent()
                 ->write('foreach ($data as $field => $value) {')
@@ -307,7 +307,7 @@ class Table extends BaseTable
             ->write(' * @param array $fields')
             ->write(' * @return array')
             ->write(' */')
-            ->write('public function getArrayCopy(array $fields = array())')
+            ->write('public function getArrayCopy(array $fields = [])')
             ->write('{')
             ->indent()
                 ->write('$dataFields = array(%s);', implode(', ', array_map(function($column) {
@@ -316,7 +316,7 @@ class Table extends BaseTable
                 ->write('$relationFields = array(%s);', implode(', ', array_map(function($relation) {
                     return sprintf('\'%s\'', lcfirst($relation->getReferencedTable()->getModelName()));
                 }, $relations)))
-                ->write('$copiedFields = array();')
+                ->write('$copiedFields = [];')
                 ->write('foreach ($relationFields as $relationField) {')
                 ->indent()
                     ->write('$map = null;')

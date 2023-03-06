@@ -76,7 +76,7 @@ class Table extends BaseTable
         );
         // cache Mode
         if (!is_null($cacheMode = $this->getEntityCacheMode())) {
-            $values['cache'] = array();
+            $values['cache'] = [];
             $values['cache']['usage'] = $cacheMode;
         }
         if ($this->getConfig()->get(Formatter::CFG_AUTOMATIC_REPOSITORY)) {
@@ -110,7 +110,7 @@ class Table extends BaseTable
                 case $type === 'indexes' && $index->isIndex():
                 case $type === 'uniqueConstraints' && $index->isUnique():
                     if (!isset($values[$type])) {
-                        $values[$type] = array();
+                        $values[$type] = [];
                     }
                     $values[$type][$index->getName()] = array('columns' => $index->getColumnNames());
                     break;
@@ -125,7 +125,7 @@ class Table extends BaseTable
         foreach ($this->getColumns() as $column) {
             if ($column->isPrimary()) {
                 if (!isset($values['id'])) {
-                    $values['id'] = array();
+                    $values['id'] = [];
                 }
                 $values['id'][$column->getColumnName()] = $column->asYAML();
             } else {
@@ -133,7 +133,7 @@ class Table extends BaseTable
                     continue;
                 }
                 if (!isset($values['fields'])) {
-                    $values['fields'] = array();
+                    $values['fields'] = [];
                 }
                 $values['fields'][$column->getColumnName()] = $column->asYAML();
             }
@@ -162,7 +162,7 @@ class Table extends BaseTable
                 $type = 'oneToMany';
                 $relationName = lcfirst($this->getRelatedVarName($targetEntity, $related, true));
                 if (!isset($values[$type])) {
-                    $values[$type] = array();
+                    $values[$type] = [];
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity'  => $targetEntity,
@@ -177,7 +177,7 @@ class Table extends BaseTable
                 $type = 'oneToOne';
                 $relationName = lcfirst($targetEntity);
                 if (!isset($values[$type])) {
-                    $values[$type] = array();
+                    $values[$type] = [];
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity' => $targetEntity,
@@ -207,7 +207,7 @@ class Table extends BaseTable
                 $type = 'manyToOne';
                 $relationName = lcfirst($this->getRelatedVarName($targetEntity, $related));
                 if (!isset($values[$type])) {
-                    $values[$type] = array();
+                    $values[$type] = [];
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity'  => $targetEntityFQCN,
@@ -219,7 +219,7 @@ class Table extends BaseTable
                 $type = 'oneToOne';
                 $relationName = lcfirst($targetEntity);
                 if (!isset($values[$type])) {
-                    $values[$type] = array();
+                    $values[$type] = [];
                 }
                 $values[$type][$relationName] = array_merge(array(
                     'targetEntity'  => $targetEntityFQCN,
@@ -259,7 +259,7 @@ class Table extends BaseTable
 
                 $type = 'manyToMany';
                 if (!isset($values[$type])) {
-                    $values[$type] = array();
+                    $values[$type] = [];
                 }
                 $values[$type][$relationName] = array_merge($mappings, array(
                     'joinTable' => array(
@@ -280,7 +280,7 @@ class Table extends BaseTable
 
                 $type = 'manyToMany';
                 if (!isset($values[$type])) {
-                    $values[$type] = array();
+                    $values[$type] = [];
                 }
                 $values[$type][$relationName] = $mappings;
                 if (!is_null($cacheMode = $this->getFormatter()->getCacheOption($fk2->parseComment('cache')))) {
@@ -292,9 +292,9 @@ class Table extends BaseTable
         return $this;
     }
 
-    protected function convertJoinColumns($joins = array())
+    protected function convertJoinColumns($joins = [])
     {
-        $result = array();
+        $result = [];
         foreach ($joins as $join) {
             if (!isset($join['name'])) {
                 continue;
@@ -316,7 +316,7 @@ class Table extends BaseTable
      */
     protected function getJoins(ForeignKey $fkey, $owningSide = true)
     {
-        $joins = array();
+        $joins = [];
         $lcols = $owningSide ? $fkey->getForeigns() : $fkey->getLocals();
         $fcols = $owningSide ? $fkey->getLocals() : $fkey->getForeigns();
         $onDelete = $this->getFormatter()->getDeleteRule($fkey->getParameters()->get('deleteRule'));

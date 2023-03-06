@@ -67,7 +67,7 @@ class Formatter extends BaseFormatter
             static::CFG_PHP7_TYPEHINTS                      => false,
             static::CFG_PHP7_ARG_TYPEHINTS                  => true,
             static::CFG_PHP7_RETURN_TYPEHINTS               => true,
-            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS      => array(),
+            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS      => [],
         ));
         $this->addValidators(array(
             static::CFG_QUOTE_IDENTIFIER_STRATEGY           => new ChoiceValidator(array(

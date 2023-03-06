@@ -104,7 +104,7 @@ class Table extends BaseTable
      */
     public function getLifecycleCallbacks()
     {
-        $result = array();
+        $result = [];
         if ($lifecycleCallbacks = trim($this->parseComment('lifecycleCallbacks'))) {
             foreach (explode("\n", $lifecycleCallbacks) as $callback) {
                 list($method, $handler) = explode(':', $callback, 2);
@@ -113,7 +113,7 @@ class Table extends BaseTable
                     continue;
                 }
                 if (!isset($result[$method])) {
-                    $result[$method] = array();
+                    $result[$method] = [];
                 }
                 $result[$method][] = trim($handler);
             }

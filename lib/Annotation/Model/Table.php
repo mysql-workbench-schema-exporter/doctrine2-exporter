@@ -113,7 +113,7 @@ class Table extends BaseTable
      * @param array  $options     The annotation options
      * @return \MwbExporter\Object\Annotation
      */
-    public function getAnnotation($annotation, $content = null, $options = array())
+    public function getAnnotation($annotation, $content = null, $options = [])
     {
         return new Annotation($this->addPrefix($annotation), $content, $options);
     }
@@ -126,12 +126,12 @@ class Table extends BaseTable
      */
     protected function getIndexesAnnotation($type = 'Index')
     {
-        $indices = array();
+        $indices = [];
         foreach ($this->getTableIndices() as $index) {
             switch (true) {
                 case $type === 'Index' && $index->isIndex():
                 case $type === 'UniqueConstraint' && $index->isUnique():
-                    $columns = array();
+                    $columns = [];
                     foreach ($index->getColumns() as $column) {
                         $columns[] = $this->quoteIdentifier($column->getColumnName());
                     }
@@ -170,7 +170,7 @@ class Table extends BaseTable
      */
     protected function getJoins(ForeignKey $fkey, $owningSide = true)
     {
-        $joins = array();
+        $joins = [];
         $lcols = $owningSide ? $fkey->getForeigns() : $fkey->getLocals();
         $fcols = $owningSide ? $fkey->getLocals() : $fkey->getForeigns();
         $onDelete = $this->getFormatter()->getDeleteRule($fkey->getParameters()->get('deleteRule'));
@@ -427,7 +427,7 @@ class Table extends BaseTable
      */
     protected function getUsedClasses()
     {
-        $uses = array();
+        $uses = [];
         if (count($this->getTableM2MRelations()) || count($this->getAllLocalForeignKeys())) {
             $uses[] = $this->getCollectionClass();
         }
@@ -440,7 +440,7 @@ class Table extends BaseTable
 
     protected function getInheritanceDiscriminatorColumn()
     {
-        $result = array();
+        $result = [];
         if ($column = trim($this->parseComment('discriminator'))) {
             $result['name'] = $column;
             foreach ($this->getColumns() as $col) {
@@ -471,7 +471,7 @@ class Table extends BaseTable
 
     public function writeExtendedUsedClasses(WriterInterface $writer)
     {
-        $uses = array();
+        $uses = [];
         if ($orm = $this->getOrmUse()) {
             $uses[] = $orm;
         }
@@ -481,7 +481,7 @@ class Table extends BaseTable
         return $this;
     }
 
-    protected function writeUses(WriterInterface $writer, $uses = array())
+    protected function writeUses(WriterInterface $writer, $uses = [])
     {
         if (count($uses)) {
             foreach ($uses as $use) {
@@ -1121,7 +1121,7 @@ class Table extends BaseTable
 
     public function writeSerialization(WriterInterface $writer)
     {
-        $serialized = array();
+        $serialized = [];
         foreach ($this->getColumns() as $column) {
             if (!$column->isIgnored()) {
                 $serialized[] = sprintf('\'%s\'', $column->getColumnName(false));

@@ -35,7 +35,7 @@ class Column extends BaseColumn
 {
     public function asYAML()
     {
-        $values = array();
+        $values = [];
         $values['type'] = $this->getFormatter()->getDatatypeConverter()->getMappedType($this);
         if (($length = $this->getParameters()->get('length')) && ($length != -1)) {
             $values['length'] = (int) $length;
