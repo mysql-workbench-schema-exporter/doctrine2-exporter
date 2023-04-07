@@ -15,149 +15,20 @@ This is an exporter to convert [MySQL Workbench](http://www.mysql.com/products/w
 ## Installation
 
 ```
-php composer.phar require --dev mysql-workbench-schema-exporter/doctrine2-exporter
+composer require --dev mysql-workbench-schema-exporter/doctrine2-exporter
 ```
 
 This will install the exporter and also require [mysql-workbench-schema-exporter](https://github.com/mysql-workbench-schema-exporter/mysql-workbench-schema-exporter).
 
 You then can invoke the CLI script using `vendor/bin/mysql-workbench-schema-export`.
 
-## Formatter Setup Options
+## Configuration
 
-Additionally to the [common options](https://github.com/mysql-workbench-schema-exporter/mysql-workbench-schema-exporter#configuring-mysql-workbench-schema-exporter) of mysql-workbench-schema-exporter these options are supported:
+  * [Doctrine 2.0 YAML Schema](/docs/doctrine2-yaml.md)
+  * [Doctrine 2.0 Annotation](/docs/doctrine2-annotation.md)
+  * [Doctrine 2.0 Annotation with ZF2 Input Filter Classes](/docs/doctrine2-zf2inputfilterannotation.md)
 
-Common Setup Options for Doctrine 2.0:
-
-  * `useAutomaticRepository`
-
-    Automatically generate entity repository class name.
-
-  * `bundleNamespace`
-
-    The global namespace prefix for entity class name.
-
-  * `entityNamespace`
-
-    The entity namespace.
-
-    Default is `Entity`.
-
-  * `repositoryNamespace`
-
-    The namespace prefix for entity repository class name. For this configuration to apply,
-    `useAutomaticRepository` must be set to `true`.
-
-  * `skipColumnWithRelation`
-
-    Don't generate columns definition (for YAML) or columns variable and columns getter and setter
-    (for Annotation) which has relation to other table.
-
-    Default is `false`.
-
-  * `relatedVarNameFormat`
-
-    The format for generated related column name.
-
-    Default is `%name%%related%`.
-
-  * `nullableAttribute`
-
-    How nullable attribute of columns and joins is generated. Set to `auto` if you want to
-    automatically include nullable attribute based on its value. Set to `always` to always
-    include nullable attribute.
-
-    Default is `auto`.
-
-  * `generatedValueStrategy`
-
-    The stragety for auto-generated values.
-
-    Default is `auto`.
-
-  * `defaultCascade`
-
-    The default cascade option to define.
-
-    Default is `false`.
-
-### Doctrine 2.0 YAML Schema
-
-#### Setup Options
-
-  * `extendTableNameWithSchemaName`
-
-    Include schema name beside the table name.
-
-    Default is `false`.
-
-### Doctrine 2.0 Annotation
-
-#### Setup Options
-
-  * `useAnnotationPrefix`
-
-    Doctrine annotation prefix.
-
-    Default is `ORM\`.
-
-  * `skipGetterAndSetter`
-
-    Don't generate columns getter and setter.
-
-    Default is `false`.
-
-  * `generateEntitySerialization`
-
-    Generate method `__sleep()` to include only real columns when entity is serialized.
-
-    Default is `true`.
-
-  * `generateExtendableEntity`
-
-    Generate two class for each tables in schema, one for base and one other for extend class.
-    The extend class would not be generated if it already exist. So it is safe to place custom code
-    inside the extend class.
-
-    This option will generate entity using Single Table Inheritance.
-
-    Default is `false`.
-
-  * `extendableEntityHasDiscriminator`
-
-    If enabled, `DiscriminatorColumn` and `DiscriminatorMap` annotations will be used.
-
-    Default is `true`.
-
-  * `quoteIdentifierStrategy`
-
-    This option determine wheter identifier quoting is applied or not, depend on the strategy
-    value.
-
-    * `auto`, indentifier quoting enabled if identifier is a reserved word.
-    * `always`, always quote identifier.
-    * `none`, never quote identifier.
-
-    Default is `auto`.
-
-  * `extendsClass`
-
-    This option allows you to define a base class from which all generated entities extend.
-
-    Default is `''`.
-
-  * `propertyTypehint`
-
-    This option allows you to specify whether type-hinting should be enabled for all *non-scalar* properties
-    whose type is a class. E.g. `\DateTime` would be type-hinted but not `object` or `string`.
-
-    Default is `false`.
-    
-  * `useBehavioralExtensions`
-
-    use Doctrine2 behavioral extensions like create table with name '_img' then can be auto create plugin support.
-
-    Default is `false`.
-#### Model Comment Behavior
+## Model Comment Behavior
 
   * `{d:bundleNamespace}AcmeBundle{/d:bundleNamespace}` (applied to Table)
 
@@ -246,31 +117,6 @@ Common Setup Options for Doctrine 2.0:
         {/d:relatedNames}
         
     The generated StoreProduct class will have "category" and "image" properties instead of "storeProductCategory" and "storeProductImage", while the "StoreProductImage" class will have a "product" property instead of "storeProduct".
-
-### Doctrine 2.0 Annotation with ZF2 Input Filter Classes
-
-Doctrine 2.0 Annotation with ZF2 Input Filter Classes formatter directly extend Doctrine 2.0
-Annotation. The setup options and model comment behavior exactly the same as Doctrine 2.0
-Annotation with the following addons.
-
-Add Some `Zend\Validator\StringLength`,`Zend\Filter\StringTrim`,`Zend\Filter\StripTags` as string type column
-Add Some Filters like column name with 'phone' or '_tel' auto create filter with `Zend\I18n\Validator\PhoneNumber`
-and column name with 'email' auto create filter with `Zend\Validator\EmailAddress`
-
-
-#### Setup Options
-
-  * `generateEntityPopulate`
-
-    Generate `populate()` method for entity class.
-
-    Default is `true`.
-
-  * `generateEntityGetArrayCopy`
-
-    Generate `getArrayCopy()` method for entity class.
-
-    Default is `true`.
 
 ## Command Line Interface (CLI)
 

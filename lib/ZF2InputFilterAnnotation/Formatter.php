@@ -48,7 +48,7 @@ class Formatter extends BaseFormatter
             ->add(new EntityArrayCopyConfiguration())
             ->merge([
                 FilenameConfiguration::class => 'Entity/%entity%.%extension%',
-            ])
+            ], true)
         ;
     }
 
@@ -86,5 +86,15 @@ class Formatter extends BaseFormatter
     public function getFileExtension()
     {
         return 'php';
+    }
+
+    /**
+     * Get configuration scope.
+     *
+     * @return string
+     */
+    public static function getScope()
+    {
+        return 'Doctrine 2.0 Annotation ZF2 Input Filter';
     }
 }

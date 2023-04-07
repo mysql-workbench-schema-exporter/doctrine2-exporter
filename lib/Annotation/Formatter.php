@@ -63,7 +63,7 @@ class Formatter extends BaseFormatter
             ->add(new TypehintSkipConfiguration())
             ->merge([
                 IndentationConfiguration::class => 4,
-            ])
+            ], true)
         ;
     }
 
@@ -102,5 +102,15 @@ class Formatter extends BaseFormatter
     public function getFileExtension()
     {
         return 'php';
+    }
+
+    /**
+     * Get configuration scope.
+     *
+     * @return string
+     */
+    public static function getScope()
+    {
+        return 'Doctrine 2.0 Annotation';
     }
 }

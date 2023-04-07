@@ -43,7 +43,7 @@ class Formatter extends BaseFormatter
             ->merge([
                 IndentationConfiguration::class => 4,
                 FilenameConfiguration::class => '%entity%.dcm.%extension%',
-            ])
+            ], true)
         ;
     }
 
@@ -82,5 +82,15 @@ class Formatter extends BaseFormatter
     public function getFileExtension()
     {
         return 'yml';
+    }
+
+    /**
+     * Get configuration scope.
+     *
+     * @return string
+     */
+    public static function getScope()
+    {
+        return 'Doctrine 2.0 Yaml';
     }
 }
