@@ -262,7 +262,7 @@ class Table extends BaseTable
                 $header = $this->getConfig(HeaderConfiguration::class);
                 if ($content = $header->getHeader()) {
                     $writer
-                        ->write($_this->getFormatter()->getFormattedComment($content, Comment::FORMAT_PHP))
+                        ->write($_this->getFormatter()->getFormattedComment($content, Comment::FORMAT_PHP, null))
                         ->write('')
                     ;
                 }
@@ -360,7 +360,7 @@ class Table extends BaseTable
                     $header = $this->getConfig(HeaderConfiguration::class);
                     if ($content = $header->getHeader()) {
                         $writer
-                            ->write($_this->getFormatter()->getFormattedComment($content, Comment::FORMAT_PHP))
+                            ->write($_this->getFormatter()->getFormattedComment($content, Comment::FORMAT_PHP, null))
                             ->write('')
                         ;
                     }
