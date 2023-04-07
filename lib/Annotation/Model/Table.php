@@ -28,6 +28,7 @@
 namespace MwbExporter\Formatter\Doctrine2\Annotation\Model;
 
 use MwbExporter\Configuration\Comment as CommentConfiguration;
+use MwbExporter\Configuration\Header as HeaderConfiguration;
 use MwbExporter\Configuration\M2MSkip as M2MSkipConfiguration;
 use MwbExporter\Configuration\NamingStrategy as NamingStrategyConfiguration;
 use MwbExporter\Formatter\Doctrine2\Model\Table as BaseTable;
@@ -257,6 +258,14 @@ class Table extends BaseTable
             ->write('<?php')
             ->write('')
             ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                /** @var \MwbExporter\Configuration\Header $header */
+                $header = $this->getConfig(HeaderConfiguration::class);
+                if ($content = $header->getHeader()) {
+                    $writer
+                        ->write($_this->getFormatter()->getFormattedComment($content, Comment::FORMAT_PHP))
+                        ->write('')
+                    ;
+                }
                 if ($_this->getConfig(CommentConfiguration::class)->getValue()) {
                     $writer
                         ->write($_this->getFormatter()->getComment(Comment::FORMAT_PHP))
@@ -341,13 +350,20 @@ class Table extends BaseTable
         ;
 
         $namespace = $this->getEntityNamespace();
-
         if ($extendableEntity && !$writer->getStorage()->hasFile($this->getClassFileName())) {
             $writer
                 ->open($this->getClassFileName())
                 ->write('<?php')
                 ->write('')
                 ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                    /** @var \MwbExporter\Configuration\Header $header */
+                    $header = $this->getConfig(HeaderConfiguration::class);
+                    if ($content = $header->getHeader()) {
+                        $writer
+                            ->write($_this->getFormatter()->getFormattedComment($content, Comment::FORMAT_PHP))
+                            ->write('')
+                        ;
+                    }
                     if ($_this->getConfig(CommentConfiguration::class)->getValue()) {
                         $writer
                             ->write($_this->getFormatter()->getComment(Comment::FORMAT_PHP))

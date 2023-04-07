@@ -28,7 +28,9 @@
 namespace MwbExporter\Formatter\Doctrine2\Yaml\Model;
 
 use MwbExporter\Configuration\Comment as CommentConfiguration;
+use MwbExporter\Configuration\Header as HeaderConfiguration;
 use MwbExporter\Configuration\Indentation as IndentationConfiguration;
+use MwbExporter\Configuration\Language as LanguageConfiguration;
 use MwbExporter\Configuration\M2MSkip as M2MSkipConfiguration;
 use MwbExporter\Formatter\Doctrine2\Configuration\AutomaticRepository as AutomaticRepositoryConfiguration;
 use MwbExporter\Formatter\Doctrine2\Configuration\RepositoryNamespace as RepositoryNamespaceConfiguration;
@@ -39,6 +41,9 @@ use MwbExporter\Object\YAML;
 use MwbExporter\Model\ForeignKey;
 use MwbExporter\Writer\WriterInterface;
 
+/**
+ * @method \MwbExporter\Formatter\Doctrine2\Yaml\Formatter getFormatter()
+ */
 class Table extends BaseTable
 {
     public function writeTable(WriterInterface $writer)
@@ -50,10 +55,17 @@ class Table extends BaseTable
                 return self::WRITE_M2M;
             default:
                 $this->getDocument()->addLog(sprintf('Writing table "%s"', $this->getModelName()));
-
                 $writer
                     ->open($this->getTableFileName())
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                        /** @var \MwbExporter\Configuration\Header $header */
+                        $header = $this->getConfig(HeaderConfiguration::class);
+                        if ($content = $header->getHeader()) {
+                            $writer
+                                ->write($_this->getFormatter()->getFormattedComment($content, Comment::FORMAT_YAML))
+                                ->write('')
+                            ;
+                        }
                         if ($_this->getConfig(CommentConfiguration::class)->getValue()) {
                             $writer
                                 ->write($_this->getFormatter()->getComment(Comment::FORMAT_YAML))
@@ -253,7 +265,12 @@ class Table extends BaseTable
                 'fetch' => $this->getFormatter()->getFetchOption($fk1->parseComment('fetch')),
             ];
 
-            $relationName = $this->getFormatter()->getInflector()->camelize($this->pluralize($relation['refTable']->getRawTableName()));
+            $relationName = $this->pluralize($relation['refTable']->getRawTableName());
+            /** @var \MwbExporter\Configuration\Language $lang */
+            $lang = $this->getConfig(LanguageConfiguration::class);
+            if ($inflector = $lang->getInflector()) {
+                $relationName = $inflector->camelize($relationName);
+            }
 
             // if this is the owning side, also output the JoinTable Annotation
             // otherwise use "mappedBy" feature
