@@ -4,7 +4,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2014 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
  * Copyright (c) 2013 WitteStier <development@wittestier.nl>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,14 +28,14 @@
 
 namespace MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation;
 
+use MwbExporter\Configuration\Filename as FilenameConfiguration;
 use MwbExporter\Formatter\Doctrine2\Annotation\Formatter as BaseFormatter;
+use MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation\Configuration\EntityArrayCopy as EntityArrayCopyConfiguration;
+use MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation\Configuration\EntityPopulate as EntityPopulateConfiguration;
 use MwbExporter\Model\Base;
 
 class Formatter extends BaseFormatter
 {
-    const CFG_GENERATE_ENTITY_POPULATE       = 'generateEntityPopulate';
-    const CFG_GENERATE_ENTITY_GETARRAYCOPY   = 'generateEntityGetArrayCopy';
-
     /**
      * (non-PHPdoc)
      * @see \MwbExporter\Formatter\Formatter::init()
@@ -43,11 +43,13 @@ class Formatter extends BaseFormatter
     protected function init()
     {
         parent::init();
-        $this->addConfigurations([
-            static::CFG_FILENAME                      => 'Entity/%entity%.%extension%',
-            static::CFG_GENERATE_ENTITY_POPULATE      => true,
-            static::CFG_GENERATE_ENTITY_GETARRAYCOPY  => true,
-        ]);
+        $this->getConfigurations()
+            ->add(new EntityPopulateConfiguration())
+            ->add(new EntityArrayCopyConfiguration())
+            ->merge([
+                FilenameConfiguration::class => 'Entity/%entity%.%extension%',
+            ])
+        ;
     }
 
     /**

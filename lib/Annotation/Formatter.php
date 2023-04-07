@@ -4,7 +4,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2014 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,60 +27,44 @@
 
 namespace MwbExporter\Formatter\Doctrine2\Annotation;
 
+use MwbExporter\Configuration\Indentation as IndentationConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\AnnotationPrefix as AnnotationPrefixConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\BehavioralExtension as BehavioralExtensionConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\ClassExtend as ClassExtendConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\EntityExtend as EntityExtendConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\EntityExtendDiscriminator as EntityExtendDiscriminatorConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\EntitySerialize as EntitySerializeConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\GetterSetterSkip as GetterSetterSkipConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\IdentifierQuotingStrategy as IdentifierQuotingStrategyConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\Typehint as TypehintConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintArgument as TypehintArgumentConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintReturnValue as TypehintReturnValueConfiguration;
+use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintSkip as TypehintSkipConfiguration;
 use MwbExporter\Formatter\Doctrine2\Formatter as BaseFormatter;
 use MwbExporter\Model\Base;
-use MwbExporter\Validator\ChoiceValidator;
 
 class Formatter extends BaseFormatter
 {
-    const CFG_ANNOTATION_PREFIX                     = 'useAnnotationPrefix';
-    const CFG_QUOTE_IDENTIFIER_STRATEGY             = 'quoteIdentifierStrategy';
-    const CFG_EXTENDS_CLASS                         = 'extendsClass';
-    const CFG_PHP7_TYPEHINTS                        = 'php7Typehints';
-    const CFG_PHP7_ARG_TYPEHINTS                    = 'php7ArgTypehints';
-    const CFG_PHP7_RETURN_TYPEHINTS                 = 'php7ReturnTypehints';
-    const CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS        = 'php7SkippedColumnsTypehints';
-    const CFG_SKIP_GETTER_SETTER                    = 'skipGetterAndSetter';
-    const CFG_GENERATE_ENTITY_SERIALIZATION         = 'generateEntitySerialization';
-    const CFG_GENERATE_EXTENDABLE_ENTITY            = 'generateExtendableEntity';
-    const CFG_EXTENDABLE_ENTITY_HAS_DISCRIMINATOR   = 'extendableEntityHasDiscriminator';
-    const CFG_USE_BEHAVIORAL_EXTENSIONS             = 'useBehavioralExtensions';
-
-    const QUOTE_IDENTIFIER_AUTO                     = 'auto';
-    const QUOTE_IDENTIFIER_ALWAYS                   = 'always';
-    const QUOTE_IDENTIFIER_NONE                     = 'none';
-
     protected function init()
     {
         parent::init();
-        $this->addConfigurations([
-            static::CFG_INDENTATION                         => 4,
-            static::CFG_FILENAME                            => '%entity%.%extension%',
-            static::CFG_ANNOTATION_PREFIX                   => 'ORM\\',
-            static::CFG_SKIP_GETTER_SETTER                  => false,
-            static::CFG_GENERATE_ENTITY_SERIALIZATION       => true,
-            static::CFG_GENERATE_EXTENDABLE_ENTITY          => false,
-            static::CFG_EXTENDABLE_ENTITY_HAS_DISCRIMINATOR => true,
-            static::CFG_QUOTE_IDENTIFIER_STRATEGY           => static::QUOTE_IDENTIFIER_AUTO,
-            static::CFG_EXTENDS_CLASS                       => '',
-            static::CFG_USE_BEHAVIORAL_EXTENSIONS           => false,
-            static::CFG_PHP7_TYPEHINTS                      => false,
-            static::CFG_PHP7_ARG_TYPEHINTS                  => true,
-            static::CFG_PHP7_RETURN_TYPEHINTS               => true,
-            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS      => [],
-        ]);
-        $this->addValidators([
-            static::CFG_QUOTE_IDENTIFIER_STRATEGY           => new ChoiceValidator([
-                static::QUOTE_IDENTIFIER_AUTO,
-                static::QUOTE_IDENTIFIER_ALWAYS,
-                static::QUOTE_IDENTIFIER_NONE,
-            ]),
-        ]);
-        $this->addDependency([
-            static::CFG_PHP7_ARG_TYPEHINTS,
-            static::CFG_PHP7_RETURN_TYPEHINTS,
-            static::CFG_PHP7_SKIPPED_COLUMNS_TYPEHINTS,
-        ], static::CFG_PHP7_TYPEHINTS, true);
+        $this->getConfigurations()
+            ->add(new AnnotationPrefixConfiguration())
+            ->add(new ClassExtendConfiguration())
+            ->add(new GetterSetterSkipConfiguration())
+            ->add(new IdentifierQuotingStrategyConfiguration())
+            ->add(new EntitySerializeConfiguration())
+            ->add(new EntityExtendConfiguration())
+            ->add(new EntityExtendDiscriminatorConfiguration())
+            ->add(new BehavioralExtensionConfiguration())
+            ->add(new TypehintConfiguration())
+            ->add(new TypehintArgumentConfiguration())
+            ->add(new TypehintReturnValueConfiguration())
+            ->add(new TypehintSkipConfiguration())
+            ->merge([
+                IndentationConfiguration::class => 4,
+            ])
+        ;
     }
 
     /**

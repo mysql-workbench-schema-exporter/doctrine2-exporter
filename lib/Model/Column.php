@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2012-2014 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,21 +26,23 @@
 
 namespace MwbExporter\Formatter\Doctrine2\Model;
 
-use MwbExporter\Model\Column as BaseColumn;
 use MwbExporter\Formatter\DatatypeConverterInterface;
+use MwbExporter\Formatter\Doctrine2\Configuration\ColumnWithRelationSkip as ColumnWithRelationSkipConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\NullableAttribute as NullableAttributeConfiguration;
 use MwbExporter\Formatter\Doctrine2\Formatter;
+use MwbExporter\Model\Column as BaseColumn;
 
 class Column extends BaseColumn
 {
-    const RELATION_ONE_TO_ONE = '1:1';
-    const RELATION_ONE_TO_MANY = '1:M';
-    const RELATION_MANY_TO_ONE = 'M:1';
-    const RELATION_MANY_TO_MANY = 'M:M';
+    public const RELATION_ONE_TO_ONE = '1:1';
+    public const RELATION_ONE_TO_MANY = '1:M';
+    public const RELATION_MANY_TO_ONE = 'M:1';
+    public const RELATION_MANY_TO_MANY = 'M:M';
 
     /**
      * Current Doctrine default value for nullable column attribute.
      */
-    const NULLABLE_DEFAULT = false;
+    public const NULLABLE_DEFAULT = false;
 
     /**
      * Is nullable attribute always required.
@@ -49,7 +51,7 @@ class Column extends BaseColumn
      */
     protected function isAlwaysNullable()
     {
-        return $this->getConfig()->get(Formatter::CFG_NULLABLE_ATTRIBUTE) === Formatter::NULLABLE_ALWAYS;
+        return $this->getConfig(NullableAttributeConfiguration::class)->getValue() === NullableAttributeConfiguration::ALWAYS;
     }
 
     /**
@@ -88,7 +90,7 @@ class Column extends BaseColumn
             return false;
         }
         // don't ignore when configuration is not set
-        if (!$this->getConfig()->get(Formatter::CFG_SKIP_COLUMN_WITH_RELATION)) {
+        if (!$this->getConfig(ColumnWithRelationSkipConfiguration::class)->getValue()) {
             return false;
         }
         // don't ignore when column has no relation

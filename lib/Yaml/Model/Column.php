@@ -4,7 +4,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2014 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 namespace MwbExporter\Formatter\Doctrine2\Yaml\Model;
 
 use MwbExporter\Formatter\DatatypeConverterInterface;
+use MwbExporter\Formatter\Doctrine2\Configuration\GeneratedValueStrategy as GeneratedValueStrategyConfiguration;
 use MwbExporter\Formatter\Doctrine2\Model\Column as BaseColumn;
 use MwbExporter\Formatter\Doctrine2\Yaml\Formatter;
 
@@ -51,7 +52,7 @@ class Column extends BaseColumn
             $values['unsigned'] = true;
         }
         if ($this->isAutoIncrement()) {
-            $values['generator'] = ['strategy' => strtoupper($this->getConfig()->get(Formatter::CFG_GENERATED_VALUE_STRATEGY))];
+            $values['generator'] = ['strategy' => strtoupper($this->getConfig(GeneratedValueStrategyConfiguration::class)->getValue())];
         }
         if ($this->getDefaultValue() !== null) {
             $values['options']['default'] = $this->isStringType()
@@ -66,9 +67,9 @@ class Column extends BaseColumn
      * Get if the type is a string or not.
      * @return bool Return true if the datatype is a string, else return false.
      */
-    private function isStringType() {
-        switch($this->getColumnType())
-        {
+    private function isStringType()
+    {
+        switch($this->getColumnType()) {
             case DatatypeConverterInterface::DATATYPE_CHAR:
             case DatatypeConverterInterface::DATATYPE_VARCHAR:
                 return true;

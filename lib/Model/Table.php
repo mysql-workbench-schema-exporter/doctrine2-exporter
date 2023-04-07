@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2012-2014 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,10 @@
 
 namespace MwbExporter\Formatter\Doctrine2\Model;
 
+use MwbExporter\Formatter\Doctrine2\Configuration\BundleNamespace as BundleNamespaceConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\EntityNamespace as EntityNamespaceConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\RelatedVarName as RelatedVarNameConfiguration;
 use MwbExporter\Model\Table as BaseTable;
-use MwbExporter\Formatter\Doctrine2\Formatter;
 
 class Table extends BaseTable
 {
@@ -39,10 +41,10 @@ class Table extends BaseTable
     public function getEntityNamespace()
     {
         $namespace = '';
-        if (($bundleNamespace = $this->parseComment('bundleNamespace')) || ($bundleNamespace = $this->getConfig()->get(Formatter::CFG_BUNDLE_NAMESPACE))) {
+        if (($bundleNamespace = $this->parseComment('bundleNamespace')) || ($bundleNamespace = $this->getConfig(BundleNamespaceConfiguration::class)->getValue())) {
             $namespace = $bundleNamespace.'\\';
         }
-        if ($entityNamespace = $this->getConfig()->get(Formatter::CFG_ENTITY_NAMESPACE)) {
+        if ($entityNamespace = $this->getConfig(EntityNamespaceConfiguration::class)->getValue()) {
             $namespace .= $entityNamespace;
         } else {
             $namespace .= 'Entity';
@@ -51,7 +53,8 @@ class Table extends BaseTable
         return $namespace;
     }
 
-    public function getBaseEntityNamespace() {
+    public function getBaseEntityNamespace()
+    {
         return 'Base\\'.$this->getEntityNamespace();
     }
 
@@ -154,7 +157,7 @@ class Table extends BaseTable
         if ($nameFromCommentTag) {
             $name = $nameFromCommentTag;
         } else {
-            $name = $related ? strtr($this->getConfig()->get(Formatter::CFG_RELATED_VAR_NAME_FORMAT), ['%name%' => $name, '%related%' => $related]) : $name;
+            $name = $related ? strtr($this->getConfig(RelatedVarNameConfiguration::class)->getValue(), ['%name%' => $name, '%related%' => $related]) : $name;
         }
 
         return $plural ? $this->pluralize($name) : $name;

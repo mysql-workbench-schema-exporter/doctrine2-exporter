@@ -3,9 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
- * Copyright (c) 2013 WitteStier <development@wittestier.nl>
+ * Copyright (c) 2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +24,25 @@
  * THE SOFTWARE.
  */
 
-namespace MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation;
+namespace MwbExporter\Formatter\Doctrine2\Annotation\Configuration;
 
-use MwbExporter\Formatter\Doctrine2\Annotation\DatatypeConverter as BaseDatatypeConverter;
+use MwbExporter\Configuration\Configuration;
 
-class DatatypeConverter extends BaseDatatypeConverter
+/**
+ * Enable typehint on method arguments.
+ *
+ * @author Toha <tohenk@yahoo.com>
+ * @config argumentTypehint|php7ArgTypehints
+ * @label Enable typehint on argument
+ */
+class TypehintArgument extends Configuration
 {
+    protected function initialize()
+    {
+        $this->category = 'doctrineConfiguration';
+        $this->defaultValue = true;
+        $this->depends = [
+            Typehint::class => true,
+        ];
+    }
 }

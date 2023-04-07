@@ -3,9 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
- * Copyright (c) 2013 WitteStier <development@wittestier.nl>
+ * Copyright (c) 2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +24,39 @@
  * THE SOFTWARE.
  */
 
-namespace MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation;
+namespace MwbExporter\Formatter\Doctrine2\Configuration;
 
-use MwbExporter\Formatter\Doctrine2\Annotation\DatatypeConverter as BaseDatatypeConverter;
+use MwbExporter\Configuration\Configuration;
 
-class DatatypeConverter extends BaseDatatypeConverter
+/**
+ * The default cascade option to define.
+ *
+ * @author Toha <tohenk@yahoo.com>
+ * @config defaultCascade
+ * @label Default cascade
+ */
+class Cascade extends Configuration
 {
+    public const NONE = false;
+    public const PERSIST = 'persist';
+    public const REMOVE = 'remove';
+    public const MERGE = 'merge';
+    public const DETACH = 'detach';
+    public const ALL = 'all';
+    public const REFRESH = 'refresh';
+
+    protected function initialize()
+    {
+        $this->category = 'doctrineConfiguration';
+        $this->defaultValue = static::NONE;
+        $this->choices = [
+            static::NONE,
+            static::PERSIST,
+            static::REMOVE,
+            static::MERGE,
+            static::DETACH,
+            static::ALL,
+            static::REFRESH,
+        ];
+    }
 }

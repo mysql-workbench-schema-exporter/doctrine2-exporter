@@ -4,7 +4,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2020 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,73 +27,35 @@
 
 namespace MwbExporter\Formatter\Doctrine2;
 
+use MwbExporter\Formatter\Doctrine2\Configuration\AutomaticRepository as AutomaticRepositoryConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\BundleNamespace as BundleNamespaceConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\Cascade as CascadeConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\ColumnWithRelationSkip as ColumnWithRelationSkipConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\EntityNamespace as EntityNamespaceConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\GeneratedValueStrategy as GeneratedValueStrategyConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\NullableAttribute as NullableAttributeConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\RelatedVarName as RelatedVarNameConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\RepositoryNamespace as RepositoryNamespaceConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\TableNamePrefix as TableNamePrefixConfiguration;
 use MwbExporter\Formatter\Formatter as BaseFormatter;
-use MwbExporter\Validator\ChoiceValidator;
-use MwbExporter\Validator\Validator;
 
 abstract class Formatter extends BaseFormatter
 {
-    const CFG_BUNDLE_NAMESPACE               = 'bundleNamespace';
-    const CFG_ENTITY_NAMESPACE               = 'entityNamespace';
-    const CFG_REPOSITORY_NAMESPACE           = 'repositoryNamespace';
-    const CFG_AUTOMATIC_REPOSITORY           = 'useAutomaticRepository';
-    const CFG_SKIP_COLUMN_WITH_RELATION      = 'skipColumnWithRelation';
-    const CFG_RELATED_VAR_NAME_FORMAT        = 'relatedVarNameFormat';
-    const CFG_NULLABLE_ATTRIBUTE             = 'nullableAttribute';
-    const CFG_GENERATED_VALUE_STRATEGY       = 'generatedValueStrategy';
-    const CFG_DEFAULT_CASCADE                = 'defaultCascade';
-    const CFG_PREFIX_TABLENAME               = 'prefixTablename';
-
-    const NULLABLE_AUTO                      = 'auto';
-    const NULLABLE_ALWAYS                    = 'always';
-
-    const GENERATED_VALUE_AUTO               = 'auto';
-    const GENERATED_VALUE_IDENTITY           = 'identity';
-    const GENERATED_VALUE_SEQUENCE           = 'sequence';
-    const GENERATED_VALUE_TABLE              = 'table';
-    const GENERATED_VALUE_NONE               = 'none';
-
-    const CASCADE_OPTION_PERSIST             = 'persist';
-    const CASCADE_OPTION_REMOVE              = 'remove';
-    const CASCADE_OPTION_MERGE               = 'merge';
-    const CASCADE_OPTION_DETACH              = 'detach';
-    const CASCADE_OPTION_ALL                 = 'all';
-    const CASCADE_OPTION_REFRESH             = 'refresh';
-
     protected function init()
     {
         parent::init();
-        $this->addConfigurations([
-            static::CFG_BUNDLE_NAMESPACE              => '',
-            static::CFG_PREFIX_TABLENAME              => '',
-            static::CFG_ENTITY_NAMESPACE              => '',
-            static::CFG_REPOSITORY_NAMESPACE          => '',
-            static::CFG_AUTOMATIC_REPOSITORY          => true,
-            static::CFG_SKIP_COLUMN_WITH_RELATION     => false,
-            static::CFG_RELATED_VAR_NAME_FORMAT       => '%name%_%related%',
-            static::CFG_NULLABLE_ATTRIBUTE            => static::NULLABLE_AUTO,
-            static::CFG_GENERATED_VALUE_STRATEGY      => static::GENERATED_VALUE_AUTO,
-            static::CFG_DEFAULT_CASCADE               => false,
-        ]);
-        $this->addValidators([
-            static::CFG_NULLABLE_ATTRIBUTE            => new ChoiceValidator([static::NULLABLE_AUTO, static::NULLABLE_ALWAYS]),
-            static::CFG_GENERATED_VALUE_STRATEGY      => new ChoiceValidator([
-                static::GENERATED_VALUE_AUTO,
-                static::GENERATED_VALUE_IDENTITY,
-                static::GENERATED_VALUE_SEQUENCE,
-                static::GENERATED_VALUE_TABLE,
-                static::GENERATED_VALUE_NONE,
-            ]),
-            static::CFG_DEFAULT_CASCADE               => new ChoiceValidator([
-                static::CASCADE_OPTION_PERSIST,
-                static::CASCADE_OPTION_REMOVE,
-                static::CASCADE_OPTION_DETACH,
-                static::CASCADE_OPTION_MERGE,
-                static::CASCADE_OPTION_ALL,
-                static::CASCADE_OPTION_REFRESH,
-                false
-            ]),
-        ]);
+        $this->getConfigurations()
+            ->add(new AutomaticRepositoryConfiguration())
+            ->add(new RepositoryNamespaceConfiguration())
+            ->add(new BundleNamespaceConfiguration())
+            ->add(new EntityNamespaceConfiguration())
+            ->add(new TableNamePrefixConfiguration())
+            ->add(new RelatedVarNameConfiguration())
+            ->add(new ColumnWithRelationSkipConfiguration())
+            ->add(new GeneratedValueStrategyConfiguration())
+            ->add(new NullableAttributeConfiguration())
+            ->add(new CascadeConfiguration())
+        ;
     }
 
     public function getVersion()
@@ -141,19 +103,18 @@ abstract class Formatter extends BaseFormatter
      */
     public function getCascadeOption($cascadeValue)
     {
-        $defaultCascade = $this->getRegistry()->config->get(static::CFG_DEFAULT_CASCADE);
+        /** @var \MwbExporter\Formatter\Doctrine2\Configuration\Cascade $cascade */
+        $cascade = $this->getConfig(CascadeConfiguration::class);
+        $defaultCascade = $cascade->getValue();
         if (empty($cascadeValue) && !empty($defaultCascade)) {
             return [$defaultCascade];
         }
 
-        /** @var Validator $validator */
-        $validator = $this->getRegistry()->validator->get(static::CFG_DEFAULT_CASCADE);
-
         $cascadeValue = array_map('strtolower', array_map('trim', explode(',', (string) $cascadeValue)));
-        $cascadeValue = array_intersect($cascadeValue, $validator->getChoices());
+        $cascadeValue = array_intersect($cascadeValue, $cascade->getChoices());
         $cascadeValue = array_filter($cascadeValue);
         if (empty($cascadeValue)) {
-            return null;
+            return;
         }
 
         return $cascadeValue;
@@ -169,7 +130,7 @@ abstract class Formatter extends BaseFormatter
     {
         if ($cacheValue) {
             $cacheValue = strtoupper($cacheValue);
-            if (in_array($cacheValue, array('READ_ONLY', 'NONSTRICT_READ_WRITE', 'READ_WRITE'))) {
+            if (in_array($cacheValue, ['READ_ONLY', 'NONSTRICT_READ_WRITE', 'READ_WRITE'])) {
                 return $cacheValue;
             }
         }
@@ -190,7 +151,7 @@ abstract class Formatter extends BaseFormatter
                 if (count($values = array_map('trim', explode(',', $line)))) {
                     $column = $values[0];
                     $order = (count($values) > 1) ? strtoupper($values[1]) : null;
-                    if (!in_array($order, array('ASC', 'DESC'))) {
+                    if (!in_array($order, ['ASC', 'DESC'])) {
                         $order = 'ASC';
                     }
                     $orders[$column] = $order;
@@ -211,7 +172,7 @@ abstract class Formatter extends BaseFormatter
     {
         if ($fetchValue) {
             $fetchValue = strtoupper($fetchValue);
-            if (in_array($fetchValue, array('EAGER', 'LAZY', 'EXTRA_LAZY'))) {
+            if (in_array($fetchValue, ['EAGER', 'LAZY', 'EXTRA_LAZY'])) {
                 return $fetchValue;
             }
         }
@@ -229,7 +190,6 @@ abstract class Formatter extends BaseFormatter
             switch (strtolower($booleanValue)) {
                 case 'true':
                     return true;
-
                 case 'false':
                     return false;
             }
@@ -258,6 +218,6 @@ abstract class Formatter extends BaseFormatter
      */
     protected function getCommentTagPrefixes()
     {
-        return array_merge(parent::getCommentTagPrefixes(), array('d', 'doctrine'));
+        return array_merge(parent::getCommentTagPrefixes(), ['d', 'doctrine']);
     }
 }

@@ -3,9 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
- * Copyright (c) 2013 WitteStier <development@wittestier.nl>
+ * Copyright (c) 2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +24,36 @@
  * THE SOFTWARE.
  */
 
-namespace MwbExporter\Formatter\Doctrine2\ZF2InputFilterAnnotation;
+namespace MwbExporter\Formatter\Doctrine2\Annotation\Configuration;
 
-use MwbExporter\Formatter\Doctrine2\Annotation\DatatypeConverter as BaseDatatypeConverter;
+use MwbExporter\Configuration\Configuration;
 
-class DatatypeConverter extends BaseDatatypeConverter
+/**
+ * This option determine wheter identifier quoting is applied or not, depend on
+ * the strategy value.
+ *
+ * `auto`, indentifier quoting enabled if identifier is a reserved word
+ * `always`, always quote identifier
+ * `none`, never quote identifier
+ *
+ * @author Toha <tohenk@yahoo.com>
+ * @config quoteIdentifierStrategy
+ * @label Identifier quoting strategy
+ */
+class IdentifierQuotingStrategy extends Configuration
 {
+    public const AUTO = 'auto';
+    public const ALWAYS = 'always';
+    public const NONE = 'none';
+
+    protected function initialize()
+    {
+        $this->category = 'doctrineConfiguration';
+        $this->defaultValue = static::AUTO;
+        $this->choices = [
+            static::AUTO,
+            static::ALWAYS,
+            static::NONE,
+        ];
+    }
 }
