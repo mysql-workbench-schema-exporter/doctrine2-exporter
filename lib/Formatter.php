@@ -60,7 +60,7 @@ abstract class Formatter extends BaseFormatter
 
     public function getVersion()
     {
-        return 'dev';
+        return '4.0.0';
     }
 
     /**
