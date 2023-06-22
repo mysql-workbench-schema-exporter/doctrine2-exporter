@@ -53,7 +53,7 @@ class Column extends BaseColumn
     private function getStringDefaultValue()
     {
         $defaultValue = $this->getDefaultValue();
-        if (is_null($defaultValue) || 'CURRENT_TIMESTAMP' == $defaultValue) {
+        if (is_null($defaultValue) || $this->isDefaultValueCurrentTimestamp()) {
             $defaultValue = '';
         } else {
             if ($this->getColumnType() == DatatypeConverterInterface::DATATYPE_VARCHAR) {
