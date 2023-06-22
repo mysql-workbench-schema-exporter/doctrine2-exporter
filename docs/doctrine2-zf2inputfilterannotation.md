@@ -1,6 +1,6 @@
 # Doctrine 2.0 Annotation with ZF2 input filter Classes Configuration
 
-Auto generated at 2023-04-08T00:04:14+0700.
+Auto generated at 2023-04-28T09:14:39+0700.
 
 ## Global Configuration
 
@@ -9,9 +9,10 @@ Auto generated at 2023-04-08T00:04:14+0700.
     Language detemines which language used to transform singular and plural words
     used in certains other schema like Doctrine.
 
-    Valid values: `english`, `french`, `norwegian-bokmal`, `portuguese`, `spanish`, `turkish`
+    Valid values: `none`, `english`, `french`, `norwegian-bokmal`, `portuguese`, `spanish`,
+    `turkish`
 
-    Default value: `english`
+    Default value: `none`
 
   * `useTab` (alias: `useTabs`)
 
