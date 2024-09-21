@@ -48,8 +48,8 @@ use MwbExporter\Formatter\Doctrine2\Configuration\RepositoryNamespace as Reposit
 use MwbExporter\Helper\Comment;
 use MwbExporter\Helper\ReservedWords;
 use MwbExporter\Model\ForeignKey;
-use MwbExporter\Object\Annotation;
 use MwbExporter\Writer\WriterInterface;
+use NTLAB\Object\Annotation;
 
 /**
  * @method \MwbExporter\Formatter\Doctrine2\Formatter getFormatter()
@@ -129,12 +129,22 @@ class Table extends BaseTable
      *
      * @param string $annotation  The annotation name
      * @param mixed  $content     The annotation content
-     * @param array  $options     The annotation options
-     * @return \MwbExporter\Object\Annotation
+     * @param bool   $multiline   Is multiline annotation
+     * @return \NTLAB\Object\Annotation
      */
-    public function getAnnotation($annotation, $content = null, $options = [])
+    public function getAnnotation($annotation, $content = null, $multiline = false)
     {
-        return new Annotation($this->addPrefix($annotation), $content, $options);
+        $options = [
+            'annotation' => $this->addPrefix($annotation),
+            'inline' => !$multiline,
+            'skip_keys' => ['default'],
+            'skip_null' => true,
+        ];
+        if ($multiline) {
+            $options['wrapper'] = ' * %s';
+        }
+
+        return new Annotation($content, $options);
     }
 
     /**
@@ -171,7 +181,7 @@ class Table extends BaseTable
      * @param string $entity      Entity name
      * @param string $mappedBy    Column mapping
      * @param string $inversedBy  Reverse column mapping
-     * @return \MwbExporter\Object\Annotation
+     * @return \NTLAB\Object\Annotation
      */
     public function getJoinAnnotation($joinType, $entity, $mappedBy = null, $inversedBy = null)
     {
@@ -184,7 +194,7 @@ class Table extends BaseTable
      *
      * @param \MwbExporter\Model\ForeignKey $fkey  Foreign key
      * @param boolean $owningSide  Is join for owning side or vice versa
-     * @return \MwbExporter\Object\Annotation
+     * @return \NTLAB\Object\Annotation
      */
     protected function getJoins(ForeignKey $fkey, $owningSide = true)
     {
@@ -201,7 +211,7 @@ class Table extends BaseTable
             ]);
         }
 
-        return count($joins) > 1 ? $this->getAnnotation('JoinColumns', [$joins], ['multiline' => true, 'wrapper' => ' * %s']) : $joins[0];
+        return count($joins) > 1 ? $this->getAnnotation('JoinColumns', [$joins], true) : $joins[0];
     }
 
     public function writeTable(WriterInterface $writer)
@@ -711,7 +721,7 @@ class Table extends BaseTable
                             'joinColumns' => [$this->getJoins($fk1, false)],
                             'inverseJoinColumns' => [$this->getJoins($fk2, false)],
                         ],
-                        ['multiline' => true, 'wrapper' => ' * %s']
+                        true
                     ))
                     ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($fk2) {
                         if (count($orders = $_this->getFormatter()->getOrderOption($fk2->parseComment('order')))) {
