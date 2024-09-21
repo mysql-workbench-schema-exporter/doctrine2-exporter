@@ -4,7 +4,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2024 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ namespace MwbExporter\Formatter\Doctrine2\Yaml\Model;
 use MwbExporter\Formatter\DatatypeConverterInterface;
 use MwbExporter\Formatter\Doctrine2\Configuration\GeneratedValueStrategy as GeneratedValueStrategyConfiguration;
 use MwbExporter\Formatter\Doctrine2\Model\Column as BaseColumn;
-use MwbExporter\Formatter\Doctrine2\Yaml\Formatter;
 
 class Column extends BaseColumn
 {
