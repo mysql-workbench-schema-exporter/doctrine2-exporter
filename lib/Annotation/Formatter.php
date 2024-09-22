@@ -41,6 +41,7 @@ use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintArgument as
 use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintReturnValue as TypehintReturnValueConfiguration;
 use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintSkip as TypehintSkipConfiguration;
 use MwbExporter\Formatter\Doctrine2\Formatter as BaseFormatter;
+use MwbExporter\Helper\Comment;
 use MwbExporter\Model\Base;
 
 class Formatter extends BaseFormatter
@@ -65,6 +66,7 @@ class Formatter extends BaseFormatter
                 IndentationConfiguration::class => 4,
             ], true)
         ;
+        $this->commentFormat = Comment::FORMAT_PHP;
     }
 
     /**

@@ -72,45 +72,45 @@ class Column extends BaseColumn
         if (!$this->isIgnored()) {
             $useBehavioralExtensions = $this->getConfig(BehavioralExtensionConfiguration::class)->getValue();
             $isBehavioralColumn = strstr($this->getTable()->getName(), '_img') && $useBehavioralExtensions;
-            $comment = $this->getComment();
+            $comment = $this->getComment(false);
             $columnName = $this->getColumnName(false);
             $writer
-                ->write('/**')
-                ->writeIf($comment, $comment)
-                ->writeIf(
-                    $this->isPrimary,
-                    ' * '.$this->getTable()->getAnnotation('Id')
-                )
-                ->writeIf(
-                    $useBehavioralExtensions && $this->getColumnName() === 'created_at',
-                    ' * @Gedmo\Timestampable(on="create")'
-                )
-                ->writeIf(
-                    $useBehavioralExtensions && $this->getColumnName() === 'updated_at',
-                    ' * @Gedmo\Timestampable(on="update")'
-                )
-                ->write(' * '.$this->getTable()->getAnnotation('Column', $this->asAnnotation()))
-                ->writeIf(
-                    $this->isAutoIncrement(),
-                    ' * '.$this->getTable()->getAnnotation('GeneratedValue', ['strategy' => strtoupper($this->getConfig(GeneratedValueStrategyConfiguration::class)->getValue())])
-                )
-                ->writeIf(
-                    $isBehavioralColumn && strstr($this->getColumnName(), 'path'),
-                    ' * @Gedmo\UploadableFilePath'
-                )
-                ->writeIf(
-                    $isBehavioralColumn && strstr($this->getColumnName(), 'name'),
-                    ' * @Gedmo\UploadableFileName'
-                )
-                ->writeIf(
-                    $isBehavioralColumn && strstr($this->getColumnName(), 'mime'),
-                    ' * @Gedmo\UploadableFileMimeType'
-                )
-                ->writeIf(
-                    $isBehavioralColumn && strstr($this->getColumnName(), 'size'),
-                    ' * @Gedmo\UploadableFileSize'
-                )
-                ->write(' */')
+                ->commentStart()
+                    ->writeIf($comment, $comment)
+                    ->writeIf(
+                        $this->isPrimary,
+                        $this->getTable()->getAnnotation('Id')
+                    )
+                    ->writeIf(
+                        $useBehavioralExtensions && $this->getColumnName() === 'created_at',
+                        '@Gedmo\Timestampable(on="create")'
+                    )
+                    ->writeIf(
+                        $useBehavioralExtensions && $this->getColumnName() === 'updated_at',
+                        '@Gedmo\Timestampable(on="update")'
+                    )
+                    ->write($this->getTable()->getAnnotation('Column', $this->asAnnotation()))
+                    ->writeIf(
+                        $this->isAutoIncrement(),
+                        $this->getTable()->getAnnotation('GeneratedValue', ['strategy' => strtoupper($this->getConfig(GeneratedValueStrategyConfiguration::class)->getValue())])
+                    )
+                    ->writeIf(
+                        $isBehavioralColumn && strstr($this->getColumnName(), 'path'),
+                        '@Gedmo\UploadableFilePath'
+                    )
+                    ->writeIf(
+                        $isBehavioralColumn && strstr($this->getColumnName(), 'name'),
+                        '@Gedmo\UploadableFileName'
+                    )
+                    ->writeIf(
+                        $isBehavioralColumn && strstr($this->getColumnName(), 'mime'),
+                        '@Gedmo\UploadableFileMimeType'
+                    )
+                    ->writeIf(
+                        $isBehavioralColumn && strstr($this->getColumnName(), 'size'),
+                        '@Gedmo\UploadableFileSize'
+                    )
+                ->commentEnd()
                 ->write('protected $'.$columnName.$this->getStringDefaultValue().';')
                 ->write('')
             ;
@@ -141,32 +141,31 @@ class Column extends BaseColumn
 
             $writer
                 // setter
-                ->write('/**')
-                ->write(' * Set the value of '.$columnName.'.')
-                ->write(' *')
-                ->write(' * @param '.$typehints['set_phpdoc_arg'].' $'.$columnName)
-                ->write(' *')
-                ->write(' * @return '.$typehints['set_phpdoc_return'])
-                ->write(' */')
+                ->commentStart()
+                    ->write('Set the value of '.$columnName.'.')
+                    ->write('')
+                    ->write('@param '.$typehints['set_phpdoc_arg'].' $'.$columnName)
+                    ->write('@return '.$typehints['set_phpdoc_return'])
+                ->commentEnd()
                 ->write('public function set'.$this->getBeautifiedColumnName().'('.$typehints['set_arg'].'$'.$columnName.')'.$typehints['set_return'])
                 ->write('{')
                 ->indent()
-                ->write('$this->'.$columnName.' = $'.$columnName.';')
-                ->write('')
-                ->write('return $this;')
+                    ->write('$this->'.$columnName.' = $'.$columnName.';')
+                    ->write('')
+                    ->write('return $this;')
                 ->outdent()
                 ->write('}')
                 ->write('')
                 // getter
-                ->write('/**')
-                ->write(' * Get the value of '.$columnName.'.')
-                ->write(' *')
-                ->write(' * @return '.$typehints['get_phpdoc'])
-                ->write(' */')
+                ->commentStart()
+                    ->write('Get the value of '.$columnName.'.')
+                    ->write('')
+                    ->write('@return '.$typehints['get_phpdoc'])
+                ->commentEnd()
                 ->write('public function '.$this->getColumnGetterName().'()'.$typehints['get_return'])
                 ->write('{')
                 ->indent()
-                ->write('return $this->'.$columnName.';')
+                    ->write('return $this->'.$columnName.';')
                 ->outdent()
                 ->write('}')
                 ->write('')
