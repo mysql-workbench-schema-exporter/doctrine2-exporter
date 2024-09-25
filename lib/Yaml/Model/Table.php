@@ -4,7 +4,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2024 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,9 +37,9 @@ use MwbExporter\Formatter\Doctrine2\Configuration\RepositoryNamespace as Reposit
 use MwbExporter\Formatter\Doctrine2\Configuration\TableNamePrefix as TableNamePrefixConfiguration;
 use MwbExporter\Formatter\Doctrine2\Model\Table as BaseTable;
 use MwbExporter\Helper\Comment;
-use MwbExporter\Object\YAML;
 use MwbExporter\Model\ForeignKey;
 use MwbExporter\Writer\WriterInterface;
+use NTLAB\Object\YAML;
 
 /**
  * @method \MwbExporter\Formatter\Doctrine2\Yaml\Formatter getFormatter()
@@ -117,7 +117,7 @@ class Table extends BaseTable
         /** @var \MwbExporter\Configuration\Indentation $indentation */
         $indentation = $this->getConfig(IndentationConfiguration::class);
 
-        return new YAML([$namespace => $values], ['indent' => strlen($indentation->getIndentation(1)), 'skip_null_value' => true]);
+        return new YAML([$namespace => $values], ['indentation' => $indentation->getIndentation(1), 'skip_null' => true]);
     }
 
     protected function getIndicesAsYAML(&$values, $type = 'indexes')

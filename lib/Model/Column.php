@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2024 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ namespace MwbExporter\Formatter\Doctrine2\Model;
 use MwbExporter\Formatter\DatatypeConverterInterface;
 use MwbExporter\Formatter\Doctrine2\Configuration\ColumnWithRelationSkip as ColumnWithRelationSkipConfiguration;
 use MwbExporter\Formatter\Doctrine2\Configuration\NullableAttribute as NullableAttributeConfiguration;
-use MwbExporter\Formatter\Doctrine2\Formatter;
 use MwbExporter\Model\Column as BaseColumn;
 
 class Column extends BaseColumn

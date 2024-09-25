@@ -4,7 +4,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Johannes Mueller <circus2(at)web.de>
- * Copyright (c) 2012-2023 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2012-2024 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,7 @@ use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintArgument as
 use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintReturnValue as TypehintReturnValueConfiguration;
 use MwbExporter\Formatter\Doctrine2\Annotation\Configuration\TypehintSkip as TypehintSkipConfiguration;
 use MwbExporter\Formatter\Doctrine2\Formatter as BaseFormatter;
+use MwbExporter\Helper\Comment;
 use MwbExporter\Model\Base;
 
 class Formatter extends BaseFormatter
@@ -65,6 +66,7 @@ class Formatter extends BaseFormatter
                 IndentationConfiguration::class => 4,
             ], true)
         ;
+        $this->commentFormat = Comment::FORMAT_PHP;
     }
 
     /**
