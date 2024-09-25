@@ -266,18 +266,14 @@ class Table extends BaseTable
                 $header = $this->getConfig(HeaderConfiguration::class);
                 if ($content = $header->getHeader()) {
                     $writer
-                        ->commentStart()
-                            ->write($content)
-                        ->commentEnd()
+                        ->writeComment($content)
                         ->write('')
                     ;
                 }
                 if ($_this->getConfig(CommentConfiguration::class)->getValue()) {
                     if ($content = $_this->getFormatter()->getComment(null)) {
                         $writer
-                            ->commentStart()
-                                ->write($content)
-                            ->commentEnd()
+                            ->writeComment($content)
                             ->write('')
                         ;
                     }
@@ -340,9 +336,7 @@ class Table extends BaseTable
                     foreach ($lifecycleCallbacks as $callback => $handlers) {
                         foreach ($handlers as $handler) {
                             $writer
-                                ->commentStart()
-                                    ->write($this->addPrefix(ucfirst($callback)))
-                                ->commentEnd()
+                                ->writeComment($this->addPrefix(ucfirst($callback)))
                                 ->write('public function %s()', $handler)
                                 ->write('{')
                                 ->write('}')
@@ -370,18 +364,14 @@ class Table extends BaseTable
                     $header = $this->getConfig(HeaderConfiguration::class);
                     if ($content = $header->getHeader()) {
                         $writer
-                            ->commentStart()
-                                ->write($content)
-                            ->commentEnd()
+                            ->writeComment($content)
                             ->write('')
                         ;
                     }
                     if ($_this->getConfig(CommentConfiguration::class)->getValue()) {
                         if ($content = $_this->getFormatter()->getComment(null)) {
                             $writer
-                                ->commentStart()
-                                    ->write($content)
-                                ->commentEnd()
+                                ->writeComment($content)
                                 ->write('')
                             ;
                         }
