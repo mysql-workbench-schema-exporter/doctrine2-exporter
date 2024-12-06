@@ -57,7 +57,7 @@ class Table extends BaseTable
                 $this->getDocument()->addLog(sprintf('Writing table "%s"', $this->getModelName()));
                 $writer
                     ->open($this->getTableFileName())
-                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                    ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) {
                         /** @var \MwbExporter\Configuration\Header $header */
                         $header = $this->getConfig(HeaderConfiguration::class);
                         if ($content = $header->getHeader()) {

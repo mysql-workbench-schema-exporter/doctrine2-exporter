@@ -261,7 +261,7 @@ class Table extends BaseTable
             ->open($this->getClassFileName($extendableEntity ? true : false))
             ->write('<?php')
             ->write('')
-            ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+            ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) {
                 /** @var \MwbExporter\Configuration\Header $header */
                 $header = $this->getConfig(HeaderConfiguration::class);
                 if ($content = $header->getHeader()) {
@@ -286,7 +286,7 @@ class Table extends BaseTable
                 (strstr($this->getClassName($extendableEntity), 'Img') || $hasDeletableBehaviour || $hasTimestampableBehaviour),
                 'use Gedmo\Mapping\Annotation as Gedmo;'
             )
-            ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+            ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) {
                 $_this->writeUsedClasses($writer);
             })
             ->commentStart()
@@ -325,7 +325,7 @@ class Table extends BaseTable
             ->write('class '.$this->getClassName($extendableEntity).$extendsClass.$implementsInterface)
             ->write('{')
             ->indent()
-                ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($skipGetterAndSetter, $serializableEntity, $lifecycleCallbacks) {
+                ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) use ($skipGetterAndSetter, $serializableEntity, $lifecycleCallbacks) {
                     $_this->writePreClassHandler($writer);
                     $_this->writeVars($writer);
                     $_this->writeConstructor($writer);
@@ -359,7 +359,7 @@ class Table extends BaseTable
                 ->open($this->getClassFileName())
                 ->write('<?php')
                 ->write('')
-                ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) {
                     /** @var \MwbExporter\Configuration\Header $header */
                     $header = $this->getConfig(HeaderConfiguration::class);
                     if ($content = $header->getHeader()) {
@@ -381,7 +381,7 @@ class Table extends BaseTable
                 ->write('')
                 ->write('use %s\\%s;', $namespace, $this->getClassName(true, 'Base\\'))
                 ->write('')
-                ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) {
                     $_this->writeExtendedUsedClasses($writer);
                 })
                 ->commentStart()
@@ -599,7 +599,7 @@ class Table extends BaseTable
                         ->writeIf($cacheMode, $this->getAnnotation('Cache', [$cacheMode]))
                         ->write($this->getAnnotation('OneToMany', $annotationOptions))
                         ->write($this->getJoins($local))
-                        ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($local) {
+                        ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) use ($local) {
                             if (count($orders = $_this->getFormatter()->getOrderOption($local->parseComment('order')))) {
                                 $writer
                                     ->write($_this->getAnnotation('OrderBy', [$orders]))
@@ -719,7 +719,7 @@ class Table extends BaseTable
                             ],
                             true
                         ))
-                        ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($fk2) {
+                        ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) use ($fk2) {
                             if (count($orders = $_this->getFormatter()->getOrderOption($fk2->parseComment('order')))) {
                                 $writer
                                     ->write($_this->getAnnotation('OrderBy', [$orders]))
@@ -759,7 +759,7 @@ class Table extends BaseTable
             ->write('public function __construct()')
             ->write('{')
             ->indent()
-                ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) {
                     $_this->writeCurrentTimestampConstructor($writer);
                     $_this->writeRelationsConstructor($writer);
                     $_this->writeManyToManyConstructor($writer);
@@ -1101,7 +1101,7 @@ class Table extends BaseTable
                 ->write('public function add'.$relation['refTable']->getModelName().'('.$typehints['add_arg'].'$'.$this->getNaming($relation['refTable']->getName()).')'.$typehints['add_return'])
                 ->write('{')
                 ->indent()
-                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation) {
+                    ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) use ($isOwningSide, $relation) {
                         if ($isOwningSide) {
                             $writer->write('$%s->add%s($this);', $_this->getNaming($relation['refTable']->getName()), $_this->getModelName());
                         }
@@ -1121,7 +1121,7 @@ class Table extends BaseTable
                 ->write('public function remove'.$relation['refTable']->getModelName().'('.$typehints['remove_arg'].'$'.$this->getNaming($relation['refTable']->getName()).')'.$typehints['remove_return'])
                 ->write('{')
                 ->indent()
-                    ->writeCallback(function(WriterInterface $writer, Table $_this = null) use ($isOwningSide, $relation) {
+                    ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) use ($isOwningSide, $relation) {
                         if ($isOwningSide) {
                             $writer->write('$%s->remove%s($this);', $_this->getNaming($relation['refTable']->getName()), $_this->getModelName());
                         }

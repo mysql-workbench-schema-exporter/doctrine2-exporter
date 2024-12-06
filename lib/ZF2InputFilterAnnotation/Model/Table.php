@@ -118,7 +118,7 @@ class Table extends BaseTable
             ->write('$factory = new InputFactory();')
             ->write('$filters = [')
             ->indent()
-                ->writeCallback(function(WriterInterface $writer, Table $_this = null) {
+                ->writeCallback(function(WriterInterface $writer, ?Table $_this = null) {
                     $_this->writeInputFilterColumns($writer);
                 })
             ->outdent()
