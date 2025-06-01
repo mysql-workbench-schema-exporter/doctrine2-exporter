@@ -27,7 +27,7 @@
 	],
 	"require" : {
 		"php" : ">=7.2",
-		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "dev-master",
+		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "^4.1",
 		"ntlab/php-obj": "^1.0"
 	},
 	"autoload" : {
