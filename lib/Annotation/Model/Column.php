@@ -129,6 +129,12 @@ class Column extends BaseColumn
             $nativeType = $converter->getNativeType($converter->getMappedType($this));
             $columnName = $this->getColumnName(false);
 
+            // 如果是 enum 字段，使用枚举类名作为类型
+            if ($this->isEnum()) {
+                $enumClassName = $this->getEnumClassName();
+                $nativeType = $enumClassName;
+            }
+
             $typehints = [
                 'set_phpdoc_arg' => $this->typehint($nativeType, !$this->isNotNull()),
                 'set_phpdoc_return' => $this->typehint($table->getNamespace(), false),
@@ -185,6 +191,13 @@ class Column extends BaseColumn
             'name' => ($quotedColumnName = $this->getTable()->quoteIdentifier($this->getColumnName())) !== $columnName ? $quotedColumnName : null,
             'type' => $this->getFormatter()->getDatatypeConverter()->getMappedType($this),
         ];
+
+        // 如果是 enum 字段，使用枚举类名作为类型
+        if ($this->isEnum()) {
+            $enumClassName = $this->getEnumClassName();
+            $attributes['type'] = $enumClassName;
+        }
+
         if (($length = $this->parameters->get('length')) && ($length != -1)) {
             $attributes['length'] = (int) $length;
         }
