@@ -69,12 +69,53 @@ class Table extends BaseTable
     public function writePostClassHandler(WriterInterface $writer)
     {
         $this->writeInputFilter($writer);
+        // 添加validate方法
+        $this->writeValidate($writer);
+        // 添加populate方法
         if ($this->getConfig(EntityPopulateConfiguration::class)->getValue()) {
             $this->writePopulate($writer);
         }
+        // 添加getArrayCopy方法
         if ($this->getConfig(EntityArrayCopyConfiguration::class)->getValue()) {
             $this->writeGetArrayCopy($writer);
         }
+
+        return $this;
+    }
+
+    /**
+     * Write validate method.
+     *
+     * @param \MwbExporter\Writer\WriterInterface $writer
+     * @return \MwbExporter\Formatter\Doctrine2\LaminasInputFilterAnnotation\Model\Table
+     */
+    public function writeValidate(WriterInterface $writer)
+    {
+        $writer
+            ->commentStart()
+                ->write('Validate entity data using backend InputFilter')
+                ->write('')
+                ->write('@return bool')
+                ->write('@throws \Exception')
+            ->commentEnd()
+            ->write('public function validate()')
+            ->write('{')
+            ->indent()  
+                ->write('$inputFilter = $this->getInputFilter();')
+                ->write('$data = $this->getArrayCopy();')
+                ->write('$inputFilter->setData($data);')
+                ->write('')
+                ->write('if (!$inputFilter->isValid()) {')
+                ->indent()  
+                    ->write('throw new \Exception("Validation failed: " . json_encode($inputFilter->getMessages(), JSON_UNESCAPED_UNICODE));')
+                ->outdent()
+            ->write('}')
+            ->write('')
+            ->write('return true;')
+            ->outdent() 
+            ->write('}')
+            ->write('')
+        ;
 
         return $this;
     }
@@ -230,15 +271,13 @@ class Table extends BaseTable
             }
  
             // 如果默认值是当前时间戳，则不添加默认值
-            if ($column->isDefaultValueCurrentTimestamp()) {
-                $s_filters = '[]';
-            } else {
-                $s_filters = $column->getDefaultValue() ? sprintf('[
+            if (!$column->isDefaultValueCurrentTimestamp() && $column->getDefaultValue() != '') {
+                $s_filters .= $column->getDefaultValue() ? sprintf(',[
                     \'options\' => [
                         \'name\' => \'Laminas\Filter\DefaultValue\',
                         \'default\' => %s,
                     ],
-                ]', $column->getDefaultValue()) : '[]';
+                ]', $column->getDefaultValue()) : ',[]';
             }
             
             $writer
