@@ -27,6 +27,7 @@ You then can invoke the CLI script using `vendor/bin/mysql-workbench-schema-expo
   * [Doctrine 2.0 YAML Schema](/docs/doctrine2-yaml.md)
   * [Doctrine 2.0 Annotation](/docs/doctrine2-annotation.md)
   * [Doctrine 2.0 Annotation with ZF2 Input Filter Classes](/docs/doctrine2-zf2inputfilterannotation.md)
+  * [Doctrine 2.0 Annotation with Laminas Input Filter Classes](/docs/doctrine2-laminasinputfilterannotation.md)
 
 ## Model Comment Behavior
 

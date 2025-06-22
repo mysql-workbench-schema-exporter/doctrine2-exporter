@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "4.X" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "4.X" ]
 
 permissions:
   contents: read

@@ -136,7 +136,7 @@ class Table extends BaseTable
         return new Annotation($content, [
             'annotation' => $this->addPrefix($annotation),
             'inline' => !$multiline,
-            'skip_keys' => ['default'],
+            'skip_keys' => [],
             'skip_null' => true,
         ]);
     }
@@ -353,6 +353,9 @@ class Table extends BaseTable
             ->close()
         ;
 
+        // 生成枚举类
+        $this->generateEnumClasses($writer, $namespace);
+
         $namespace = $this->getEntityNamespace();
         if ($extendableEntity && !$writer->getStorage()->hasFile($this->getClassFileName())) {
             $writer
@@ -397,6 +400,25 @@ class Table extends BaseTable
                 ->close()
             ;
         }
+    }
+
+    /**
+     * Generate enum classes for enum columns
+     *
+     * @param WriterInterface $writer
+     * @param string $namespace
+     * @return $this
+     */
+    protected function generateEnumClasses(WriterInterface $writer, $namespace)
+    {
+        foreach ($this->getColumns() as $column) {
+            if ($column->isEnum()) {
+                $enumGenerator = new \MwbExporter\Formatter\Doctrine2\Enum\EnumGenerator($column, $namespace);
+                $enumGenerator->generate($writer);
+            }
+        }
+
+        return $this;
     }
 
     /**

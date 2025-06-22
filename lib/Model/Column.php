@@ -29,6 +29,7 @@ namespace MwbExporter\Formatter\Doctrine2\Model;
 use MwbExporter\Formatter\DatatypeConverterInterface;
 use MwbExporter\Formatter\Doctrine2\Configuration\ColumnWithRelationSkip as ColumnWithRelationSkipConfiguration;
 use MwbExporter\Formatter\Doctrine2\Configuration\NullableAttribute as NullableAttributeConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\EnumSupport as EnumSupportConfiguration;
 use MwbExporter\Model\Column as BaseColumn;
 
 class Column extends BaseColumn
@@ -121,5 +122,57 @@ class Column extends BaseColumn
         }
 
         return false;
+    }
+
+    /**
+     * Check if column is enum.
+     *
+     * @return boolean
+     */
+    public function isEnum()
+    {
+        $columnType = $this->getColumnType();
+        $enumSupport = $this->getConfig(EnumSupportConfiguration::class)->getValue();
+        return DatatypeConverterInterface::DATATYPE_ENUM === $columnType && $enumSupport === true;
+    }
+
+    /**
+     * Get enum values from column parameters.
+     *
+     * @return array
+     */
+    public function getEnumValues()
+    {
+        if (!$this->isEnum()) {
+            return [];
+        }
+
+        $enumValues = $this->parameters->get('datatypeExplicitParams');
+        $values = [];
+        if ($enumValues) {
+            // 解析 enum 值，格式通常是 "('admin', 'manager', 'statistician', 'accountant')"
+            $values = array_map(function($value) {
+                return trim($value, "\'()");
+            }, explode("', '", $enumValues));
+        }
+
+        return $values;
+    }
+
+    /**
+     * Get enum class name for this column.
+     *
+     * @return string
+     */
+    public function getEnumClassName()
+    {
+        if (!$this->isEnum()) {
+            return '';
+        }
+
+        $tableName = $this->getTable()->getModelName();
+        $columnName = $this->getBeautifiedColumnName();
+        
+        return $tableName . $columnName . 'Enum';
     }
 }

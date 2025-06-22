@@ -27,7 +27,7 @@
 	],
 	"require" : {
 		"php" : ">=7.2",
-		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "dev-master",
+		"mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": "^4.1",
 		"ntlab/php-obj": "^1.0"
 	},
 	"autoload" : {
@@ -40,7 +40,8 @@
 			"formatters" : {
 				"doctrine2-annotation" : "MwbExporter\\Formatter\\Doctrine2\\Annotation\\Formatter",
 				"doctrine2-yaml" : "MwbExporter\\Formatter\\Doctrine2\\Yaml\\Formatter",
-				"doctrine2-zf2inputfilterannotation" : "MwbExporter\\Formatter\\Doctrine2\\ZF2InputFilterAnnotation\\Formatter"
+				"doctrine2-zf2inputfilterannotation" : "MwbExporter\\Formatter\\Doctrine2\\ZF2InputFilterAnnotation\\Formatter",
+				"doctrine2-laminasinputfilterannotation" : "MwbExporter\\Formatter\\Doctrine2\\LaminasInputFilterAnnotation\\Formatter"
 			}
 		}
 	}

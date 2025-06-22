@@ -37,6 +37,7 @@ use MwbExporter\Formatter\Doctrine2\Configuration\NullableAttribute as NullableA
 use MwbExporter\Formatter\Doctrine2\Configuration\RelatedVarName as RelatedVarNameConfiguration;
 use MwbExporter\Formatter\Doctrine2\Configuration\RepositoryNamespace as RepositoryNamespaceConfiguration;
 use MwbExporter\Formatter\Doctrine2\Configuration\TableNamePrefix as TableNamePrefixConfiguration;
+use MwbExporter\Formatter\Doctrine2\Configuration\EnumSupport as EnumSupportConfiguration;
 use MwbExporter\Formatter\Formatter as BaseFormatter;
 
 abstract class Formatter extends BaseFormatter
@@ -55,12 +56,13 @@ abstract class Formatter extends BaseFormatter
             ->add(new GeneratedValueStrategyConfiguration())
             ->add(new NullableAttributeConfiguration())
             ->add(new CascadeConfiguration())
+            ->add(new EnumSupportConfiguration())
         ;
     }
 
     public function getVersion()
     {
-        return 'dev';
+        return '4.1.0';
     }
 
     /**
