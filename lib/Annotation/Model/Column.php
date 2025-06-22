@@ -89,6 +89,7 @@ class Column extends BaseColumn
                         $useBehavioralExtensions && $this->getColumnName() === 'updated_at',
                         '@Gedmo\Timestampable(on="update")'
                     )
+                
                     ->write($this->getTable()->getAnnotation('Column', $this->asAnnotation()))
                     ->writeIf(
                         $this->isAutoIncrement(),
@@ -217,17 +218,36 @@ class Column extends BaseColumn
         if ('json' === $attributes['type']) {
             $attributes['options']['jsonb'] = true;
         }
+        // 先定获取到的默认值是字符串，需要去掉单引号和双引号，再判断写入注解
+        $rawDefaultValue = $this->normalizeDefaultValue($this->parameters->get('defaultValue'));
 
-        $rawDefaultValue = $this->parameters->get('defaultValue') == 'NULL' ? null : $this->parameters->get('defaultValue');
-        if ($rawDefaultValue !== '') {
-            $attributes['options']['default'] = $rawDefaultValue === '' ? null : $rawDefaultValue;
-        }
+        // 处理默认值并清理空的options
+        return $this->processAttributesWithDefaultValue($attributes, $rawDefaultValue);
+    }
 
-        if (count($attributes['options']) == 0) {
+    private function normalizeDefaultValue(string $value): string
+    {
+        return trim($value, '\'\"');
+    }
+
+    private function processAttributesWithDefaultValue(array $attributes, string $defaultValue): array
+    {
+        // 如果默认值有效，添加到options
+        if ($this->isValidDefaultValue($defaultValue)) {
+            $attributes['options']['default'] = $defaultValue;
+        }else{
             unset($attributes['options']);
         }
-
+    
+        
         return $attributes;
+    }
+
+    private function isValidDefaultValue(string $value): bool
+    {
+        return $value !== 'NULL' && 
+            $value !== '' && 
+            !$this->isDefaultValueCurrentTimestamp();
     }
 
     protected function typehint($type, $nullable)

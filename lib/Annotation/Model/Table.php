@@ -136,7 +136,7 @@ class Table extends BaseTable
         return new Annotation($content, [
             'annotation' => $this->addPrefix($annotation),
             'inline' => !$multiline,
-            'skip_keys' => ['default'],
+            'skip_keys' => [],
             'skip_null' => true,
         ]);
     }

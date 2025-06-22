@@ -228,12 +228,25 @@ class Table extends BaseTable
                             [\'name\' => \'Laminas\I18n\Validator\PostCode\'],
                         ]';
             }
-
+ 
+            // 如果默认值是当前时间戳，则不添加默认值
+            if ($column->isDefaultValueCurrentTimestamp()) {
+                $s_filters = '[]';
+            } else {
+                $s_filters = $column->getDefaultValue() ? sprintf('[
+                    \'options\' => [
+                        \'name\' => \'Laminas\Filter\DefaultValue\',
+                        \'default\' => %s,
+                    ],
+                ]', $column->getDefaultValue()) : '[]';
+            }
+            
             $writer
                 ->write('[')
                 ->indent()
                 ->write('\'name\' => \'%s\',', $column->getColumnName())
-                ->write('\'required\' => %s,', $column->isNotNull() && !$column->isPrimary() ? 'true' : 'false')
+                // 如果存在默认值，则不设置required
+                ->write('\'required\' => %s,', $column->isNotNull() && !$column->isPrimary() && $column->getDefaultValue() == '' ? 'true' : 'false')
                 ->write('\'filters\' => %s,', $s_filters)
                 ->write('\'validators\' => %s,', $s_validators)
                 ->outdent()
