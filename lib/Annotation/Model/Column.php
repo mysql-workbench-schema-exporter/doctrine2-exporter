@@ -131,7 +131,7 @@ class Column extends BaseColumn
 
             // 如果是 enum 字段，使用枚举类名作为类型
             if ($this->isEnum()) {
-                $enumClassName = $this->getEnumClassName();
+                $enumClassName = $table->getEntityNamespace() . '\\' . $this->getEnumClassName();
                 $nativeType = $enumClassName;
             }
 
@@ -194,7 +194,7 @@ class Column extends BaseColumn
 
         // 如果是 enum 字段，使用枚举类名作为类型
         if ($this->isEnum()) {
-            $enumClassName = $this->getEnumClassName();
+            $enumClassName = $this->getTable()->getEntityNamespace() . '\\' . $this->getEnumClassName();
             $attributes['type'] = $enumClassName;
         }
 
