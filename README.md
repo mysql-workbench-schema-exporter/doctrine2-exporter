@@ -9,7 +9,7 @@ This is an exporter to convert [MySQL Workbench](http://www.mysql.com/products/w
 
 ## Prerequisites
 
-  * PHP 7.2+
+  * PHP 7.4+
   * Composer to install the dependencies
 
 ## Installation
